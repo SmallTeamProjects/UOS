@@ -1,0 +1,98 @@
+{
+    "network":[
+        {
+            "interval":100,
+            "sound":[
+                "typing multiple"
+            ],
+            "text_type":"line",
+            "text":[
+                "ERROR 0x03C663A1",
+                "\"Network connection not found\""
+            ]
+        }
+    ],
+	"power":[
+        {
+            "interval":100,
+            "sound":[
+                "typing multiple"
+            ],
+            "text_type":"line",
+            "text":[
+                "ERROR 0x0AABFF00",
+                "\"Primary power source unavailable\"",
+                "\"Check all cords and plugs for connection\""
+            ]
+        }
+    ],
+	"read":[
+        {
+            "interval":100,
+            "sound":[
+                "typing multiple"
+            ],
+            "text_type":"line",
+            "text":[
+                "ERROR 0x07F6BAAC",
+                "\"Bad data. Cannot read\""
+            ]
+        }
+    ],
+	"input":[
+        {
+            "interval":100,
+            "sound":[
+                "typing multiple"
+            ],
+            "text_type":"line",
+            "text":[
+                "ERROR 0x00B636C6",
+                "\"No input device found\"",
+                "\"Connect a keyboard\""
+            ]
+        }
+    ],
+	"processor":[
+        {
+            "interval":100,
+            "sound":[
+                "typing multiple"
+            ],
+            "text_type":"line",
+            "text":[
+                "ERROR 0xFFFFF710",
+                "\"Processor",
+				"Corru;xsfkleg,,g364[735}3__.\""
+            ]
+        }
+    ],
+	"storage":[
+        {
+            "interval":100,
+            "sound":[
+                "typing multiple"
+            ],
+            "text_type":"line",
+            "text":[
+                "ERROR 0xF141A013",
+                "\"No Data Storage Detected.\"",
+				"\"Check Tape Drive Connection.\""
+            ]
+        }
+    ],
+	"boot":[
+        {
+            "interval":100,
+            "sound":[
+                "typing multiple"
+            ],
+            "text_type":"line",
+            "text":[
+                "ERROR 0x357C5001",
+                "\"Bad Sectors Found In Boot Block.\"",
+				"\"Terminal Error.\""
+            ]
+        }
+    ],
+}
