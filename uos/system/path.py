@@ -12,17 +12,36 @@ class UOS_Path:
     current = DRIVE
     mounted = {}
 
-    def __init__(self, source, location=None):
+    def __init__(self, source=None, location=None):
         if isinstance(source, (tuple, list)):
             source = '.'.join(source)
 
         if location:
             source = os.path.join(location, source)
 
-        self.path = self.uos_join(source)
+        if source:
+            self.path = self.uos_join(source)
+        else:
+            self.path = UOS_Path.current
 
     def basename(self):
         return os.path.basename(self.path)
+
+    def change_dir(self, *dirs):
+        old_path = self.path
+        self.path = os.path.normpath(os.path.join(self.path, *dirs))
+        if self.path.startswith(UOS_Variables.user_rootpath()):
+            return True
+        elif UOS_Variables.user_has_privilege():
+            if self.path.startswith(UOS_Path.DRIVE):
+                return True
+
+        for holotape in UOS_Path.mounted:
+            if self.path.startswith(holotape):
+                return True
+
+        self.path = old_path
+        return False
 
     def exists(self):
         return os.path.exists(self.path)
@@ -50,8 +69,8 @@ class UOS_Path:
 
     def uos_join(self, path):
         path_split = self.uos_split(path)
-        admin = UOS_Variables.group in ['admin', 'maintainence']
-        if admin and path_split[0] == 'uos':
+        privilege = UOS_Variables.user_has_privilege()
+        if privilege and path_split[0] == 'uos':
             return os.path.join(UOS_Path.DRIVE, path[3:])
 
         for key in UOS_Path.mounted.keys():

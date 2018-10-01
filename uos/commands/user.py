@@ -90,8 +90,16 @@ class UserCommands(BaseCommand):
                      "          -a",
                "CREATE ?"])
 
-    def command_change_dir(self, dir):
-        pass
+    def command_change_dir(self, *dirs):
+        source = UOS.Drive.Path()
+        if source.change_dir(*dirs):
+            if source.isdir():
+                UOS.Drive.Path.current = source.path
+                self.writer_add('Dir has been change')
+            else:
+                self.writer_add('Is not a directory')
+        else:
+            self.writer_add('Does not exists')
 
     def command_delete_dir(self, dirname, location=None):
         dirpath = UOS.Drive.Path(dirname, location)

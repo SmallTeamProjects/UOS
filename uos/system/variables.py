@@ -8,5 +8,5 @@ class UOS_Variables:
     color = COLORS['green']
     color_key = 'green'
     interval = 40
-    group = None
+    group = None # deprecated use UOS_Variables.user_has_privilege
     idle = False

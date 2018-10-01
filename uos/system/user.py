@@ -18,6 +18,14 @@ class UOS_User:
     has_any = False
     has_admin = False
 
+    @classmethod
+    def get_current(cls):
+        return cls.current
+
+    @classmethod
+    def has_privilege(cls):
+        return cls.current.group in ['admin', 'maintainence']
+
     # if accounts.f exists.
     # load all user profile and store in accounts.
     # load last hex use
@@ -100,3 +108,9 @@ class UOS_User:
         else:
             cls.current = None
             UOS_Path.current = UOS_Path.DRIVE
+
+    @classmethod
+    def variable_setup(cls):
+        UOS_Variables.user_has_privilege = cls.has_privilege
+        UOS_Variables.user_current = cls.get_current
+        UOS_Variables.user_rootpath = cls.rootpath

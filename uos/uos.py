@@ -4,6 +4,8 @@ from .system import *
 
 
 class UOS:
+    UOS_User.variable_setup()
+
     Screen = UOS_Screen
     Drive = UOS_Drive
     State = UOS_State
@@ -11,7 +13,6 @@ class UOS:
     User = UOS_User
     Data = UOS_Data
     Variables = UOS_Variables
-
     sounds = UOS_Sounds()
 
     @classmethod
