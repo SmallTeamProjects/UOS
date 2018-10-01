@@ -9,6 +9,7 @@ class DefaultCommands(BaseCommand):
             'LOGON': self.command_logon,
             'LOGON ?': self.command_logon_help,
             'SHOW TIME': self.command_show_time,
+            'MINIGAME': self.command_minigame,
             }
         elif UOS.User.has_any:
             self.command_list = {
@@ -16,11 +17,13 @@ class DefaultCommands(BaseCommand):
             'LOGON ?': self.command_logon_help,
             'SETUP': self.command_setup,
             'SHOW TIME': self.command_show_time,
+            'MINIGAME': self.command_minigame,
             }
         else:
             self.command_list = {
             'SETUP': self.command_setup,
             'SHOW TIME': self.command_show_time,
+            'MINIGAME': self.command_minigame,
             }
 
         #testing commands
@@ -105,3 +108,6 @@ class DefaultCommands(BaseCommand):
 
     def command_system_message(self):
         pass
+
+    def command_minigame(self):
+        UOS.State.next_state = 'Minigame'
