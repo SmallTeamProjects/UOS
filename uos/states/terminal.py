@@ -20,7 +20,7 @@ class Terminal(UOS.State):
             for item in UOS.Data.intro:
                 self.writer.add_input(UOS.Screen.rect.inflate(-20, -20))
                 self.writer.add(0, item.text, item.interval,
-                                item.sound, item.newline,
+                                item.sound, newline=item.newline,
                                 insert_after=item.insert_after,
                                 update_after=item.update_after)
 
@@ -31,8 +31,9 @@ class Terminal(UOS.State):
         self.writer.color_change()
 
     def event(self, event):
-        if event.type == pygame.KEYDOWN:
-            self.writer.event_keydown(event)
+        if self.writer.is_finish():
+            if event.type == pygame.KEYDOWN:
+                self.writer.event_keydown(event)
 
     def render(self, surface):
         surface.fill((0,0,0))
