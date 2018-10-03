@@ -6,16 +6,31 @@ class UOS_Text:
     def __init__(self):
         path = os.path.join('resources', 'fixedsys.ttf')
         self.font = pygame.font.Font(path, 16)
+        self.alpha = 0.7
 
     def __call__(self, text, foreground=None, background=None):
         if foreground and background:
-            return self.font.render(text, 1, foreground, background)
+            image = self.font.render(text, 1, foreground, background)
         elif foreground:
-            return self.font.render(text, 1, foreground)
+            image = self.font.render(text, 1, foreground)
         elif background:
-            return self.font.render(text, 1, self.color, background)
+            image = self.font.render(text, 1, UOS_Variables.color, background)
+        else:
+            image = self.font.render(text, 1, UOS_Variables.color)
 
-        return self.font.render(text, 1, UOS_Variables.color)
+        # requires NumPy
+        image = image.convert_alpha()
+        array = pygame.surfarray.pixels_alpha(image)
+        w, h = array.shape
+        for y in range(w):
+            for x in range(h):
+                try:
+                    array[y][x] = int(array[y][x] * self.alpha)
+                except:
+                    print(array.shape, text)
+
+
+        return image
 
     def get_color(self):
         return UOS_Variables.color

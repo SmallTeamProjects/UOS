@@ -9,7 +9,8 @@ class Carrot:
         h = UOS.text.font.get_height()
         w = UOS.text.width(' ')
         cls.image = pygame.Surface((w, h))
-        cls.image.fill(UOS.text.get_color())
+        cls.image = cls.image.convert_alpha()
+        cls.image.fill((*UOS.text.get_color(), 255 * UOS.text.alpha))
 
     def __init__(self, carrot=None):
         if Carrot.image is None:

@@ -14,10 +14,7 @@ class UOS_Screen:
         cls.timer = UOS_Timer()
         cls.idle_timer = cls.timer(20000, cls.call_idle)
         cls.running = False
-        UOS_Scanline.screen_width = size[0]
-        UOS_Scanline.create()
-        cls.scanline = UOS_Scanline(cls.timer, size[1])
-        UOS_State.on_color_change.append(UOS_Scanline.create)
+        cls.scanline = UOS_Scanline(cls.timer, cls.rect)
         pygame.key.set_repeat(80,80)
 
     @staticmethod

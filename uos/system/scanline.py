@@ -1,43 +1,33 @@
 import pygame
-from .variables import UOS_Variables
 
 class UOS_Scanline:
-    screen_width = 0
-
-    @classmethod
-    def create(cls):
-        size = 5
-        cls.scanline = pygame.Surface((1, size))
-        cls.scanline = cls.scanline.convert_alpha()
-        color = pygame.Color(*UOS_Variables.color, 40)
-        for i in range(size):
-            color.a += 1
-            cls.scanline.set_at((0, i), color)
-
-        cls.scanline = pygame.transform.scale(cls.scanline, (cls.screen_width, size))
-
-    def __init__(self, timer, height):
-        self.height = height
+    def __init__(self, timer, rect):
         self.scan_position = []
-        y = 20
-        h = height / 5
-        for i in range(5):
-            self.scan_position.append(y)
+        self.rect = rect
+        self.count = 5
+        self.size = 3
+        y = 0
+        h = rect.h / self.count
+        for i in range(self.count):
+            self.scan_position.append(pygame.Rect(0, y, rect.right, self.size))
             y += h
 
-        self.scan_timer = timer(20, self.scan_call, self.scan_call_fast)
+        self.scan_timer = timer(100, self.scan_call, self.scan_call_fast)
 
     def render(self, surface):
-        for y in self.scan_position:
-            surface.blit(UOS_Scanline.scanline, (0, y))
+        scan = surface.copy()
+        for rect in self.scan_position:
+            if self.rect.contains(rect):
+                item = scan.subsurface(rect)
+                surface.blit(item, rect, special_flags=pygame.BLEND_RGBA_ADD)
 
     def scan_call(self, timer):
         for i in range(len(self.scan_position)):
-            if self.scan_position[i] < -11:
-                self.scan_position[i] += self.height + 11
+            if self.scan_position[i].bottom < 0:
+                self.scan_position[i].top = self.rect.h
             else:
-                self.scan_position[i] -= 1
+                self.scan_position[i].top -= 1
 
     def scan_call_fast(self, timer):
         for i in range(len(self.scan_position)):
-            self.scan_position[i] -= 1
+            self.scan_position[i].top -= 1
