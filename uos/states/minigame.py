@@ -1,6 +1,7 @@
 import pygame
 import math
-from random import randint,random
+import string
+from random import randint,random, choice
 from ..uos import UOS
 from ..writer import Writer
 
@@ -44,7 +45,6 @@ class MinigameBase(UOS.State):
         debug_text = 'Attempts Remaining:'
         for x in range(count):
             debug_text += ' \x7f'
-            x += 1
         return debug_text
 
     def generate_outline(self, index, hex_seed, count):
@@ -52,7 +52,6 @@ class MinigameBase(UOS.State):
         for x in range(count):
             self.writer.add(index, hex(hex_num).upper() + ' ...........')
             hex_num += 12
-            x += 1
 
     # randomizes world locations, returns 2d array with paired index and word
     def find_places(self,words,difficulty,characters):
@@ -78,38 +77,15 @@ class MinigameBase(UOS.State):
     def generate_display(self,places,difficulty,characters):
         places = places[:]
         display = ''
-        for x in range(len(characters)):
+        x = 0
+        while x < len(characters):
             if len(places) > 0 and x == places[0][0]:
                 display += places[0][1]
                 x += difficulty
             else:
-                display += self.random_character()
+                display += choice(string.punctuation)
                 x += 1
         return display
-
-    # gives random junk character
-    def random_character(self):
-        fillers = ['(',')',
-                   '<','>',
-                   '{','}',
-                   '[',']',
-                   '=',
-                   '_',
-                   '-',
-                   '.',
-                   '/',
-                   '$',
-                   '@',
-                   ';',
-                   ':',
-                   '%',
-                   '^',
-                   '&',
-                   '|',
-                   ',',
-                   '*',
-                   '\'']
-        return str(fillers[randint(0,len(fillers))])
 
     # takes the entire code string and breaks it into lines
     def split_into_lines(self,display,lines,line_length):
@@ -144,8 +120,8 @@ class MinigameBase(UOS.State):
                     if closers[br_index] in queue > 0:
                         end_index = closers[br_index] in queue
                         snippet = queue[0:end_index + 1]
-                        chars = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-                        if any((c in chars) for c in snippet):  # supposed to check for letters
+                        # supposed to check for letters
+                        if any((c in string.ascii_uppercase) for c in snippet):
                             index +=1
                         else:
                             sets.append([index, index + end_index, snippet])
