@@ -54,16 +54,3 @@ class UOS_Screen:
             cls.clock.tick(fps)
 
         pygame.quit()
-
-    @classmethod
-    def scan_call(self, timer):
-        for i in range(len(self.scan_position)):
-            if self.scan_position[i] < -11:
-                self.scan_position[i] += UOS.Screen.rect.h + 11
-            else:
-                self.scan_position[i] -= 1
-
-    @classmethod
-    def scan_call_fast(self, timer):
-        for i in range(len(self.scan_position)):
-            self.scan_position[i] -= 1
