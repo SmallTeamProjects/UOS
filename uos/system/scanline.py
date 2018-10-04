@@ -1,30 +1,42 @@
+import os
 import pygame
 
 class UOS_Scanline:
     def __init__(self, timer, rect):
-        surfaces = [pygame.Surface((1,1)), pygame.Surface((1,1))]
-        surfaces[0].fill((190,190,190))
-        surfaces[1].fill((210,210,210))
-        self.scanline = (pygame.transform.scale(surfaces[0], (rect.w, 2)),
-                         pygame.transform.scale(surfaces[1], (rect.w, 2)))
-
-        self.scan_position = [[],[]]
         self.rect = rect
-        for i in range(0, rect.h, 12):
-            self.scan_position[0].append([0, i])
-            self.scan_position[1].append([0, i + 6])
+        try:
+            static_lines = os.path.join("resources", "images", "screen_multiply.png")
+            self.static_lines = pygame.image.load(static_lines)
+            self.static_lines = self.static_lines.convert_alpha()
+        except:
+            self.static_lines = self.create_static_lines()
 
-        self.scan_timer = timer(150, self.scan_call)
+        # TODO moving scan line
+        self.scan_position = []
+
+        #self.scan_timer = timer(150, self.scan_call)
+
+    def create_static_lines(self):
+        surfaces = (self.create_surface_line((186,186,186), 3),
+                    self.create_surface_line((210,210,210), 3))
+
+        surface = pygame.Surface(self.rect.size)
+        surface.fill((255,255,255))
+
+        for i in range(0, self.rect.h, 12):
+            surface.blit(surfaces[0], (0, i))
+            surface.blit(surfaces[1], (0, i + 6))
+
+        return surface
+
+    def create_surface_line(self, color, size):
+        surface = pygame.Surface((1,1))
+        surface.fill(color)
+        return pygame.transform.scale(surface, (self.rect.w, size))
 
     def render(self, surface):
-        for i in range(len(self.scan_position)):
-            for pos in self.scan_position[i]:
-                surface.blit(self.scanline[i], pos,
-                    special_flags=pygame.BLEND_MULT)
+        surface.blit(self.static_lines, (0,0), special_flags=pygame.BLEND_MULT)
 
     def scan_call(self, timer):
-        for i in range(len(self.scan_position)):
-            for pos in self.scan_position[i]:
-                pos[1] -= 1
-                if pos[1] < 0:
-                    pos[1] = self.rect.h - 1
+        # TODO
+        pass

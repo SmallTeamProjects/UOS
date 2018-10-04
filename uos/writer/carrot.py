@@ -6,11 +6,11 @@ class Carrot:
 
     @classmethod
     def create_image(cls):
-        h = UOS.text.font.get_height()
+        h = UOS.text.font.get_height() - 3
         w = UOS.text.width(' ')
         cls.image = pygame.Surface((w, h))
         cls.image = cls.image.convert_alpha()
-        cls.image.fill((*UOS.text.get_color())
+        cls.image.fill(UOS.text.get_color())
 
     def __init__(self, carrot=None):
         if Carrot.image is None:
@@ -32,7 +32,7 @@ class Carrot:
         if self.show:
             x, y = self.topleft
             x += self.x
-            surface.blit(Carrot.image, (x, y))
+            surface.blit(Carrot.image, (x, y + 2))
             if self.black_letter:
                 surface.blit(self.black_letter, (x, y))
 
