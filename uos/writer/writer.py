@@ -46,6 +46,10 @@ class Writer:
             block.callback_timer.stop = True
             block.writer.flush()
 
+    # returns WriterText
+    def get_line(self, index, line_number):
+        return self.blocks[index].writer.bufferbox.items[line_number]
+
     def is_finish(self):
         return False not in [b.is_finish() for b in self.blocks]
 
