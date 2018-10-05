@@ -86,6 +86,10 @@ class InputBlock(OutputBlock):
         OutputBlock.add(self, text, interval, sound_keys, newline, invisible,
                         insert_after, update_after)
 
+    def color_change(self):
+        OutputBlock.color_change(self)
+        self.text_line.text.update_image()
+
     def cursor_blink(self, timer):
         self.text_line.carrot.blink()
 
