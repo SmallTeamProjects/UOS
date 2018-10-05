@@ -1,9 +1,10 @@
 import pygame
 import math
 import string
-from random import randint,random, choice
+from random import randint, random, choice, shuffle
 from ..uos import UOS
 from ..writer import Writer
+from ..writer.carrot import Carrot
 
 
 class MinigameBase(UOS.State):
@@ -21,6 +22,15 @@ class MinigameBase(UOS.State):
         # body3
         self.writer.add_input(pygame.Rect(364, h, 140, 342), True, 0, True)
         # configuration variables
+        self.text_width = UOS.text.width(' ')
+        self.carrot = Carrot()
+        self.carrot.show = False
+        self.carrot.init = False
+        self.carrot.block = 1
+        self.carrot.line = 0
+        self.carrot.width = self.text_width * 8
+        self.carrot.topleft = [self.carrot.width, h * 4]
+
         self.header = 'temp header'
         self.hex_seed = randint(4096, 65535)
         self.attempts = attempts
@@ -31,15 +41,14 @@ class MinigameBase(UOS.State):
         self.secret_word = 'APPLE'
         self.words = []
         self.places = []
-        self.display = ''
         self.select = 0
+        self.generate_display()
 
     def call_back(self):
         UOS.State.flip_state = self._state.track
 
     def call_selection(self):
         pass
-
 
     def attempts_remaining(self, count):
         debug_text = 'Attempts Remaining:'
@@ -49,8 +58,10 @@ class MinigameBase(UOS.State):
 
     def generate_outline(self, index, hex_seed, count):
         hex_num = hex_seed
+        i = (index - 1) * 16
         for x in range(count):
-            self.writer.add(index, hex(hex_num).upper() + ' ...........')
+            self.writer.add(index, hex(hex_num).upper() + ' ............', 20,
+                update_after = (20, 7, self.display_buffer[x + i]))
             hex_num += 12
 
     # randomizes world locations, returns 2d array with paired index and word
@@ -74,26 +85,33 @@ class MinigameBase(UOS.State):
         return places.sort()  # this might need tweaking
 
     # creates the full grid by filling remaining space with junk
-    def generate_display(self,places,difficulty,characters):
-        places = places[:]
-        display = ''
-        x = 0
-        while x < len(characters):
-            if len(places) > 0 and x == places[0][0]:
-                display += places[0][1]
-                x += difficulty
-            else:
-                display += choice(string.punctuation)
-                x += 1
-        return display
+    def generate_display(self):
+        self.display_buffer = ''
+        # temp words
+        random_words = ['APPLE', 'READY', 'WORLD', 'HELLO', 'FILED', 'JAMMED',
+                        'WALLS', 'BOXES', 'JUNK', 'MIRCO', 'CHIPS', 'COMS',
+                        'LISTS', 'FOLLOW', 'PRINT', 'WHILE', 'CLASS']
 
-    # takes the entire code string and breaks it into lines
-    def split_into_lines(self,display,lines,line_length):
-        screen = []
-        for x in range(len(lines)):
-            screen.append(display[0:line_length])
-            display = display[line_length]
-        return screen
+        shuffle(random_words)
+        max_junk = 34
+        min_junk = 24
+        word_count = 0
+        junk_count = min_junk + 1
+        x = 0
+        while x < self.characters:
+            if ((randint(0, 5) == 0 and junk_count > min_junk) or
+                 junk_count > max_junk) and word_count < 10:
+                self.display_buffer += random_words[word_count]
+                x += len(random_words[word_count])
+                word_count += 1
+                junk_count = 0
+            else:
+                self.display_buffer += choice(string.punctuation)
+                junk_count += 1
+                x += 1
+
+        # split into lines
+        self.display_buffer = [self.display_buffer[i:i + 12] for i in range(0, self.characters, 12)]
 
     # highlight words UNFINISHED
     def highlight_word(self,places,difficulty):
@@ -209,46 +227,62 @@ class MinigameBase(UOS.State):
         if self.writer.is_finish():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_DOWN:
-                    UOS.sounds.play('scroll')
-                    self.select += 12
-                    self.select %= len(self.selection)
-                    while self.selection[self.select] is None:
-                        self.select += 12
-                        self.select %= len(self.selection)
+                    self.event_update_line(1)
 
                 elif event.key == pygame.K_UP:
-                    UOS.sounds.play('scroll')
-                    self.select -= 12
-                    self.select %= len(self.selection)
-                    while self.selection[self.select] is None:
-                        self.select -= 12
-                        self.select %= len(self.selection)
+                    self.event_update_line(-1)
 
                 elif event.key == pygame.K_LEFT:
-                    self.select -= 1
-                    self.select %= len(self.selection)
-                    while self.selection[self.select] is None:
-                        self.select -= 1
-                        self.select %= len(self.selection)
+                    self.event_update_pos(-1)
 
                 elif event.key == pygame.K_RIGHT:
-                    UOS.sounds.play('scroll')
-                    self.select += 1
-                    self.select %= len(self.selection)
-                    while self.selection[self.select] is None:
-                        self.select += 1
-                        self.select %= len(self.selection)
+                    self.event_update_pos(1)
 
                 elif event.key == pygame.K_RETURN:
                     UOS.sounds.play('attempt')
                     # todo get selected word
 
+    def event_update_block(self):
+        self.carrot.block = self.carrot.block % 2 + 1
+        self.carrot.topleft[0] = self.writer.blocks[self.carrot.block].rect.left
+        self.carrot.topleft[0] += self.carrot.width - 8
+
+    def event_update_line(self, inc):
+        UOS.sounds.play('scroll')
+        self.carrot.line += inc
+        if self.carrot.line > 15 or self.carrot.line < 0:
+            self.event_update_block()
+        self.carrot.line %= 16
+        height = self.writer.blocks[self.carrot.block].rect.top
+        self.carrot.topleft[1] = height + UOS.text.get_linesize() * self.carrot.line
+        self.update_carrot_data()
+
+    def event_update_pos(self, inc):
+        UOS.sounds.play('scroll')
+        self.carrot.pos += inc
+        if self.carrot.pos > 11 or self.carrot.pos < 0:
+            self.event_update_block()
+        self.carrot.pos %= 12
+        self.update_carrot_data()
+
     def render(self, surface):
+        if self.writer.is_finish() and not self.carrot.init:
+            self.carrot.init = True
+            self.carrot.show = True
+            self.update_carrot_data()
+
         surface.fill((0,0,0))
         self.writer.render(surface)
+        self.carrot.render(surface)
 
     def render_text(self, text):
         return UOS.text(text, (0,0,0), UOS.text.get_color())
+
+    def update_carrot_data(self):
+        i = (self.carrot.block - 1) * 16
+        letter = self.display_buffer[self.carrot.line + i][self.carrot.pos]
+        self.carrot.black_letter = UOS.text(letter, (0,0,0))
+        self.carrot.x = self.text_width * self.carrot.pos
 
 
 class Minigame(MinigameBase):
