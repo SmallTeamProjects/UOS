@@ -98,6 +98,10 @@ class MinigameBase(UOS.State):
         word_count = 0
         junk_count = min_junk + 1
         x = 0
+
+        # remove . from punctuation
+        punctuation = string.punctuation
+        punctuation = punctuation[:13] + punctuation[14:]
         while x < self.characters:
             if ((randint(0, 5) == 0 and junk_count > min_junk) or
                  junk_count > max_junk) and word_count < 10:
@@ -106,7 +110,7 @@ class MinigameBase(UOS.State):
                 word_count += 1
                 junk_count = 0
             else:
-                self.display_buffer += choice(string.punctuation)
+                self.display_buffer += choice(punctuation)
                 junk_count += 1
                 x += 1
 
