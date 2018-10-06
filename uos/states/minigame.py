@@ -169,11 +169,12 @@ class MinigameBase(UOS.State):
         UOS.sounds.play('dud')
 
     # gets character likeness
-    def get_likeness(self, word, secret_word, visible=True):
+    def get_likeness(self, word, visible=True):
         likeness = 0
-        for x in range(len(secret_word)):
-            if word[x] == secret_word[x]:
+        for enum, letter in enumerate(self.secret_word):
+            if word[enum] == letter:
                 likeness += 1
+
         if visible:
             if likeness == len(secret_word):
                 UOS.sounds.play('good')
@@ -200,7 +201,7 @@ class MinigameBase(UOS.State):
                 # get random word from wordset
                 word = wordset[randint(0,len(wordset))]
                 # test likeness of word to secret word
-                likeliness = self.get_likeness(word,secret_word,False)
+                likeliness = self.get_likeness(word,False)
                 if word not in words and likeliness < randint(1,3) or count > 100:  # important to avoid infinite loop
                     words.append(word)
                     found = True
