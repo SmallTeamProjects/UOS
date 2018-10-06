@@ -100,13 +100,16 @@ class MinigameBase(UOS.State):
         x = 0
 
         # remove . from punctuation
+        hposition = []
         punctuation = string.punctuation
         punctuation = punctuation[:13] + punctuation[14:]
         while x < self.characters:
             if ((randint(0, 5) == 0 and junk_count > min_junk) or
                  junk_count > max_junk) and word_count < 10:
                 self.display_buffer += random_words[word_count]
-                x += len(random_words[word_count])
+                l = len(random_words[word_count])
+                hposition.append((x, x + l))
+                x += l
                 word_count += 1
                 junk_count = 0
             else:
@@ -116,15 +119,54 @@ class MinigameBase(UOS.State):
 
         # split into lines
         self.display_buffer = [self.display_buffer[i:i + 12] for i in range(0, self.characters, 12)]
+        self.generate_highlight_positions(hposition)
 
-    # highlight words UNFINISHED
-    def highlight_word(self,places,difficulty):
-        for x in range(len(places)):
-            position = int(places[x][0])
-            j = position
-            while j < position + difficulty:
-                # todo make index of words
-                j += 1
+    def generate_highlight_positions(self, hposition):
+        self.highlight_position = []
+        self.highlight_images = None
+        for position in hposition:
+            # line numbers
+            dx = position[0] // 12
+            dy = position[1] // 12
+            # position on line
+            p = position[0] % 12, position[1] % 12
+            if dx == dy or p[1] == 0:
+                if p[1] == 0:
+                    p = p[0], 12
+
+                # line number, position
+                self.highlight_position.append({'line':(dx,), 'pos':(p,)})
+            else:
+                p1 = p[0], 12
+                p2 = 0, p[1]
+                # (line number, position), (line number, position)
+                self.highlight_position.append({'line':(dx,dy), 'pos':(p1,p2)})
+
+    def carrot_highlight_words(self):
+        position = None
+        boolean_good = False
+        line = self.carrot.line + (self.carrot.block - 1) * 16
+        for pos in self.highlight_position:
+            for pline, p in zip(pos['line'], pos['pos']):
+                if pline == line:
+                    if p[0] <= self.carrot.pos < p[1]:
+                        position = pos
+                        boolean_good = True
+                        break
+
+            if boolean_good:
+                break
+
+        if position:
+            self.highlight_images = []
+            x = self.writer.blocks[self.carrot.block].rect.left - 8
+            y = self.writer.blocks[self.carrot.block].rect.top
+            for pline, p in zip(position['line'], position['pos']):
+                text = self.display_buffer[pline][p[0]:p[1]]
+                pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline % 16) + y
+                self.highlight_images.append((UOS.text(text, (0,0,0), UOS.text.get_color()), pos))
+        else:
+            self.highlight_images = None
 
     # highlight bracket sets
     def highlight_bracket_set(self,lines):
@@ -280,10 +322,15 @@ class MinigameBase(UOS.State):
         self.writer.render(surface)
         self.carrot.render(surface)
 
+        if self.highlight_images:
+            for image, pos in self.highlight_images:
+                surface.blit(image, pos)
+
     def render_text(self, text):
         return UOS.text(text, (0,0,0), UOS.text.get_color())
 
     def update_carrot_data(self):
+        self.carrot_highlight_words()
         i = (self.carrot.block - 1) * 16
         letter = self.display_buffer[self.carrot.line + i][self.carrot.pos]
         self.carrot.black_letter = UOS.text(letter, (0,0,0))
