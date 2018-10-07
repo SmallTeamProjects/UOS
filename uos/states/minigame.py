@@ -13,16 +13,16 @@ class MinigameBase(UOS.State):
         self.writer = Writer(self.timer)
         h = UOS.text.get_linesize()
         w = UOS.Screen.rect.w
-        box_width = h * 4
-        box_height = h * 16
+        top_height = h * 4
+        bottom_height = h * 16
         # header
         self.writer.add_output(pygame.Rect(8, 8, w, h * 3))
         # body1
-        self.writer.add_output(pygame.Rect(8, box_width, 186, box_height))
+        self.writer.add_output(pygame.Rect(8, top_height, 186, bottom_height))
         # body2
-        self.writer.add_output(pygame.Rect(188, box_width, 186, box_height))
+        self.writer.add_output(pygame.Rect(188, top_height, 186, bottom_height))
         # body3
-        self.writer.add_input(pygame.Rect(364, box_width, 140, box_height), True, 0, True)
+        self.writer.add_input(pygame.Rect(364, top_height, 140, bottom_height), True, 0, True)
         # configuration variables
         self.text_width = UOS.text.width(' ')
         self.carrot = Carrot()
