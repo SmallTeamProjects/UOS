@@ -286,7 +286,7 @@ class MinigameBase(UOS.State):
                     self.event_update_pos(1)
 
                 elif event.key == pygame.K_RETURN:
-                    UOS.sounds.play('attempt')
+                    UOS.sounds.play('password', 'attempt')
                     # todo get selected word
 
     def event_update_block(self):
