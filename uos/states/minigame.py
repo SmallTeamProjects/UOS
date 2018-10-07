@@ -46,6 +46,11 @@ class MinigameBase(UOS.State):
         self.select = 0
         self.generate_display()
 
+        self.tab_exit = UOS.text('Tab)EXIT')
+        self.tab_rect = self.tab_exit.get_rect()
+        self.tab_rect.y = UOS.Screen.rect.bottom - h
+        self.tab_rect.centerx = UOS.Screen.rect.centerx
+
     def call_back(self):
         UOS.State.flip_state = self._state.track
 
@@ -291,6 +296,9 @@ class MinigameBase(UOS.State):
                     UOS.sounds.play('password', 'attempt')
                     # todo get selected word
 
+                elif event.key == pygame.K_TAB:
+                    self.last_state()
+
     def event_update_block(self):
         self.carrot.block = self.carrot.block % 2 + 1
         self.carrot.topleft[0] = self.writer.blocks[self.carrot.block].rect.left
@@ -323,6 +331,9 @@ class MinigameBase(UOS.State):
         surface.fill((0,0,0))
         self.writer.render(surface)
         self.carrot.render(surface)
+
+        if self.writer.is_finish():
+            surface.blit(self.tab_exit, self.tab_rect)
 
         if self.highlight_images:
             for image, pos in self.highlight_images:
