@@ -13,7 +13,7 @@ class MinigameBase(UOS.State):
         self.writer = Writer(self.timer)
         h = UOS.text.get_linesize()
         w = UOS.Screen.rect.w
-        top_height = h * 4
+        top_height = h * 4 - 4
         bottom_height = h * 16
         # header
         self.writer.add_output(pygame.Rect(8, 8, w, h * 3))
@@ -31,7 +31,7 @@ class MinigameBase(UOS.State):
         self.carrot.block = 1
         self.carrot.line = 0
         self.carrot.width = self.text_width * 8
-        self.carrot.topleft = [self.carrot.width, h * 4]
+        self.carrot.topleft = [self.carrot.width, top_height]
 
         self.header = 'temp header'
         self.hex_seed = randint(4096, 65535)
@@ -46,10 +46,18 @@ class MinigameBase(UOS.State):
         self.select = 0
         self.generate_display()
 
+        self.brackets = UOS.text('[        ]')
+        self.brackets_rect = self.brackets.get_rect()
+        bracket_height = int(h * 1.5)
+        self.brackets = pygame.transform.scale(self.brackets, (self.brackets_rect.w, bracket_height))
+        self.brackets_rect.y = UOS.Screen.rect.bottom - bracket_height - 2
+        self.brackets_rect.centerx = UOS.Screen.rect.centerx
+
         self.tab_exit = UOS.text('Tab)EXIT')
         self.tab_rect = self.tab_exit.get_rect()
-        self.tab_rect.y = UOS.Screen.rect.bottom - h
+        self.tab_rect.y = UOS.Screen.rect.bottom - h - 4
         self.tab_rect.centerx = UOS.Screen.rect.centerx
+
 
     def call_back(self):
         UOS.State.flip_state = self._state.track
@@ -334,6 +342,7 @@ class MinigameBase(UOS.State):
 
         if self.writer.is_finish():
             surface.blit(self.tab_exit, self.tab_rect)
+            surface.blit(self.brackets, self.brackets_rect)
 
         if self.highlight_images:
             for image, pos in self.highlight_images:
