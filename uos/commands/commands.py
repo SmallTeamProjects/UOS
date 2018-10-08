@@ -80,10 +80,16 @@ class Commands:
 
     @staticmethod
     def error_guard(error, writer):
-        print(error)
+        #print(error)
         error = ''.join(error.args).split(' ')
-        print(error)
-        c = error[0].lstrip('command_').rstrip('()').upper()
+        #print(error)
+        if error[0].startswith('command_'):
+            error[0] = error[0][8:]
+            
+        c = error[0].rstrip('()').upper()
+        if '_' in c:
+            c = ' '.join(c.split('_'))
+
         if 'missing' in error:
             writer.add("{0} is missing {1} arguments".format(c, error[2]), 40)
         elif 'takes' in error:
