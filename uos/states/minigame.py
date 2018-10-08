@@ -9,10 +9,10 @@ from ..writer.carrot import Carrot
 
 class MinigameBase(UOS.State):
     def __init__(self, attempts=4):
-        UOS.State.__init__(self, None, True)
-        self.writer = Writer(self.timer)
+        UOS.State.__init__(self)
+        self.writer = Writer(self.state)
         h = UOS.text.get_linesize()
-        w = UOS.Screen.rect.w
+        w = self.state.machine.rect.w
         top_height = h * 4 - 4
         bottom_height = h * 16
         # header
@@ -50,17 +50,13 @@ class MinigameBase(UOS.State):
         self.brackets_rect = self.brackets.get_rect()
         bracket_height = int(h * 1.5)
         self.brackets = pygame.transform.scale(self.brackets, (self.brackets_rect.w, bracket_height))
-        self.brackets_rect.y = UOS.Screen.rect.bottom - bracket_height - 2
-        self.brackets_rect.centerx = UOS.Screen.rect.centerx
+        self.brackets_rect.y = self.state.machine.rect.bottom - bracket_height - 2
+        self.brackets_rect.centerx = self.state.machine.rect.centerx
 
         self.tab_exit = UOS.text('Tab)EXIT')
         self.tab_rect = self.tab_exit.get_rect()
-        self.tab_rect.y = UOS.Screen.rect.bottom - h - 4
-        self.tab_rect.centerx = UOS.Screen.rect.centerx
-
-
-    def call_back(self):
-        UOS.State.flip_state = self._state.track
+        self.tab_rect.y = self.state.machine.rect.bottom - h - 4
+        self.tab_rect.centerx = self.state.machine.rect.centerx
 
     def call_selection(self):
         pass
@@ -280,7 +276,7 @@ class MinigameBase(UOS.State):
         self.writer.add(3, '> Entry denied.')
         self.writer.add(3, '> Likeness=0')
 
-    def entrance(self, args):
+    def entrance(self):
         self.writer.flush()
         self.select = 0
 
@@ -305,7 +301,7 @@ class MinigameBase(UOS.State):
                     # todo get selected word
 
                 elif event.key == pygame.K_TAB:
-                    self.last_state()
+                    self.state.flip_back()
 
     def event_update_block(self):
         self.carrot.block = self.carrot.block % 2 + 1
@@ -371,4 +367,4 @@ class Minigame(MinigameBase):
         self.display_string()
 
     def call_selection(self):
-        self.call_back()  # placeholder
+        self.state.flip_back()  # placeholder

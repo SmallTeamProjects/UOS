@@ -6,8 +6,9 @@ from .carrot import Carrot
 from ..uos import UOS
 
 class TextEditor:
-    def __init__(self, timer, rect, padding, last_state):
-        self.timer = timer(800, self.cursor_blink)
+    def __init__(self, parent, rect, padding):
+        self.state = parent.state
+        self.timer = parent.state.timer(800, self.cursor_blink)
         self.display = SimpleNamespace(buffer=[],
                                        filename="",
                                        rect=rect,
@@ -16,8 +17,7 @@ class TextEditor:
 
         self.linesize = UOS.text.font.get_linesize() + padding
         self.max_lines = int(rect.h / self.linesize) - 1
-        link = TextEditorLine.create_link(self.timer, self.display, self.max_lines, last_state)
-        self.editor_line = TextEditorLine(link)
+        self.editor_line = TextEditorLine(self)
 
     def entrance(self, filename):
         self.display.buffer = [WriterText("", sound_keys=None, state=[WriterText.State.append])]

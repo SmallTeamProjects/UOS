@@ -37,8 +37,10 @@ class Commands:
         return False
 
     @classmethod
-    def call(cls, writer, text):
-        cls.link.writer = writer
+    def call(cls, parent, text):
+        cls.link.action = parent.parent.state
+        cls.link.parent = parent
+        cls.link.writer = parent.writer
         if cls.link.state:
             cls.call_command(cls.link.state, cls.call_args(None, text))
         else:

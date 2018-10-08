@@ -5,16 +5,13 @@ from ..writer import Writer
 
 class MenuBase(UOS.State):
     def __init__(self, header, padding=0):
-        UOS.State.__init__(self, None, True)
-        self.rect = UOS.Screen.rect.inflate(-20, -20)
-        self.writer = Writer(self.timer)
+        UOS.State.__init__(self)
+        self.rect = self.state.machine.rect.inflate(-16, -16)
+        self.writer = Writer(self.state)
         self.writer.add_output(self.rect, padding)
         self.linesize = UOS.text.get_linesize(padding)
         self.header = header
         self.select = 0
-
-    def call_back(self):
-        UOS.State.flip_state = self._state.track
 
     def call_selection(self):
         pass
@@ -37,7 +34,7 @@ class MenuBase(UOS.State):
         self.writer.add_empty(0, 2)
         self.writer.add(0, self.strings)
 
-    def entrance(self, args):
+    def entrance(self, *args):
         self.writer.flush()
         self.select = 0
 
@@ -62,7 +59,7 @@ class MenuBase(UOS.State):
 
                 elif event.key == pygame.K_LEFT:
                     UOS.sounds.play('enter')
-                    UOS.State.flip_state = self._state.track
+                    self.state.flip_back()
 
                 elif event.key in [pygame.K_RETURN, pygame.K_RIGHT]:
                     UOS.sounds.play('enter')
@@ -100,11 +97,11 @@ class Menu(MenuBase):
 
     def call_selection(self):
         if self.select == 0:
-            UOS.State.next_state = 'MenuDocuments'
+            self.state.flip('MenuDocuments')
         elif self.select == 1:
-            UOS.State.next_state = 'MenuSetting'
+            self.state.flip('MenuSetting')
         elif self.select == 4:
-            self.call_back()
+            self.state.flip_back()
 
 class MenuSetting(MenuBase):
     def __init__(self):
@@ -114,9 +111,9 @@ class MenuSetting(MenuBase):
 
     def call_selection(self):
         if self.select == 0:
-            UOS.State.next_state = 'MenuColor'
+            self.state.flip('MenuColor')
         elif self.select == 1:
-            self.call_back()
+            self.state.flip_back()
 
 class MenuColor(MenuBase):
     def __init__(self):
@@ -129,7 +126,7 @@ class MenuColor(MenuBase):
         if self.select < 3:
             UOS.State.set_color(UOS.text.get_colors()[self.select])
         elif self.select == 3:
-            self.call_back()
+            self.state.flip_back()
 
 class MenuDocuments(MenuBase):
     def __init__(self):
@@ -144,7 +141,6 @@ class MenuDocuments(MenuBase):
 
     def call_selection(self):
         if self.select == 1:
-            UOS.State.args = 'r'
-            UOS.State.next_state = 'Explorer'
+            self.state.flip('Explorer', 'r')
         elif self.select == 4:
-            self.call_back()
+            self.state.flip_back()

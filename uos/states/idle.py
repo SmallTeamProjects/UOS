@@ -4,22 +4,22 @@ from ..writer import Writer
 
 class Idle(UOS.State):
     def __init__(self):
-        UOS.State.__init__(self, None, True)
-        self.writer = Writer(self.timer)
-        self.writer.add_input(UOS.Screen.rect.inflate(-20, -20))
+        UOS.State.__init__(self)
+        self.writer = Writer(self.state)
+        self.writer.add_input(self.state.machine.rect.inflate(-20, -20))
 
     def color_change(self):
         self.writer.color_change()
 
-    def entrance(self, args):
-        UOS.Screen.idle_timer.stop = True
+    def entrance(self, *args):
+        self.state.machine.idle_timer.stop = True
         UOS.Variables.idle = True
 
     def event(self, event):
         if event.type == pygame.KEYDOWN:
             UOS.Variables.idle = False
-            UOS.Screen.idle_timer.reset()
-            self.last_state()
+            self.state.machine.idle_timer.reset()
+            self.state.flip_back()
 
     def render(self, surface):
         surface.fill((0,0,0))

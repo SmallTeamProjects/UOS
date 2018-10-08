@@ -72,8 +72,7 @@ class UserCommands(BaseCommand):
             line = "{0} file already exits.".format(filename)
             self.writer_add(line)
         else:
-            UOS.State.args = filepath.path
-            UOS.State.next_state = 'Editor'
+            self.link.action.flip('Editor', filepath.path)
 
     def command_create_help(self):
         self.writer_clear()
@@ -135,8 +134,7 @@ class UserCommands(BaseCommand):
     def command_edit_file(self, filename, filetype, location=None):
         filepath = UOS.Drive.Path((filename, filetype), location)
         if filepath.isfile():
-            UOS.State.args = filepath.path, True
-            UOS.State.next_state = 'Editor'
+            self.link.action.flip('Editor', filepath.path, True)
         else:
             self.writer_add('Unable to find {}.{}'.format(filename, filetype))
 
@@ -313,7 +311,7 @@ class UserCommands(BaseCommand):
 
     def command_set_halt_restart(self):
         UOS.User.set(None)
-        UOS.State.next_state = 'Loading'
+        self.link.action.flip('Loading')
 
     def command_set_halt_restart_maintainence(self):
         print('reset into maintainence mode')
@@ -409,4 +407,4 @@ class UserCommands(BaseCommand):
                           "HELP or ?"])
 
     def command_menu(self):
-        UOS.State.next_state = 'Menu'
+        self.link.action.flip('Menu')

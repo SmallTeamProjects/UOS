@@ -8,14 +8,9 @@ from ..uos import UOS
 
 
 class TextLine(InputLine):
-    @staticmethod
-    def create_link(append, timer, writer):
-        return SimpleNamespace(append=append,
-                               timer=timer,
-                               writer=writer)
-
-    def __init__(self, link, carrot):
-        InputLine.__init__(self, link, Carrot(carrot))
+    def __init__(self, parent, writer, carrot):
+        InputLine.__init__(self, parent, Carrot(carrot))
+        self.writer = writer
         Commands.init()
         self.recall = SimpleNamespace(pos = -1, buffer = [])
         self.clear_buffer()
@@ -74,10 +69,10 @@ class TextLine(InputLine):
                 self.recall.buffer.insert(0, self.text.buffer)
 
         text = self.text.get_text()[2:]
-        self.link.append(self.text)
+        self.writer.append(self.text)
         self.new_text()
         self.clear_buffer()
-        Commands.call(self.link.writer, text)
+        Commands.call(self, text)
 
     def keydown_up(self):
         UOS.sounds.play('typing')

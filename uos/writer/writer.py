@@ -4,8 +4,8 @@ from .carrot import Carrot
 from ..uos import UOS
 
 class Writer:
-    def __init__(self, timer):
-        self.timer = timer
+    def __init__(self, state):
+        self.state = state
         self.blocks = []
 
     # add(  # args, kwargs
@@ -22,10 +22,10 @@ class Writer:
         self.blocks[index].add_empty(count)
 
     def add_input(self, rect, system=False, padding=0, reverse=False, carrot='> '):
-        self.blocks.append(InputBlock(self.timer, rect, system, padding, reverse, carrot))
+        self.blocks.append(InputBlock(self.state, rect, system, padding, reverse, carrot))
 
     def add_output(self, rect, padding=0, reverse=False):
-        self.blocks.append(OutputBlock(self.timer, rect, padding, reverse))
+        self.blocks.append(OutputBlock(self.state, rect, padding, reverse))
 
     def clear(self, index):
         self.blocks[index].clear()
@@ -65,7 +65,7 @@ class Writer:
 
     def pause_idle(self):
         if not self.is_finish():
-            if not UOS.Screen.idle_timer.stop:
-                UOS.Screen.idle_timer.stop = True
-        elif UOS.Screen.idle_timer.stop and not UOS.Variables.idle:
-            UOS.Screen.idle_timer.restart()
+            if not self.state.machine.idle_timer.stop:
+                self.state.machine.idle_timer.stop = True
+        elif self.state.machine.idle_timer.stop and not UOS.Variables.idle:
+            self.state.machine.idle_timer.restart()

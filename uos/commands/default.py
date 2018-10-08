@@ -110,4 +110,4 @@ class DefaultCommands(BaseCommand):
         pass
 
     def command_minigame(self):
-        UOS.State.next_state = 'Minigame'
+        self.link.action.flip('Minigame')

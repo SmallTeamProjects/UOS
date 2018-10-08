@@ -7,11 +7,12 @@ from .writerbuffer import WriterBuffer
 from types import SimpleNamespace
 
 class OutputBlock:
-    def __init__(self, timer, rect, padding, reverse):
-        self.callback_timer = timer(-1, self.callback, self.callback_fast)
+    def __init__(self, state, rect, padding, reverse):
+        self.callback_timer = state.timer(-1, self.callback)
         self.callback_timer.stop = True
         self.writer = WriterBuffer(self.callback_timer, rect, padding, reverse)
         self.reverse = reverse
+        self.state = state
         self.rect = rect
 
     def add(self, text,
@@ -36,10 +37,6 @@ class OutputBlock:
         if not self.writer.handler.is_finish():
             self.writer.handler.callback(timer)
 
-    def callback_fast(self, timer):
-        if not self.writer.handler.is_finish():
-            self.writer.handler.callback_fast(timer)
-
     def color_change(self):
         for itemlist in [self.writer.bufferbox.items, self.writer.handler.buffer]:
             for item in itemlist:
@@ -56,20 +53,20 @@ class OutputBlock:
             self.writer.render(surface, True)
 
 class InputBlock(OutputBlock):
-    def __init__(self, timer, rect, system, padding, reverse, carrot='> '):
-        OutputBlock.__init__(self, timer, rect, padding, reverse)
-        self.timer = timer(800, self.cursor_blink)
+    def __init__(self, state, rect, system, padding, reverse, carrot='> '):
+        OutputBlock.__init__(self, state, rect, padding, reverse)
+        self.timer = state.timer(800, self.cursor_blink)
         self.system = system
 
         if system:
             self.writer.bufferbox.max_lines -= 1
 
         writer = SimpleNamespace(add=self.add, clear=self.clear,
+                                 append=self.writer.append,
                                  add_empty=self.add_empty,
                                  set_system=self.set_system)
 
-        link = TextLine.create_link(self.writer.append, self.timer, writer)
-        self.text_line = TextLine(link, list(carrot))
+        self.text_line = TextLine(self, writer, list(carrot))
 
     def add(self, text,
             interval=-1,

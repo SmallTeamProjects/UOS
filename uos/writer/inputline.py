@@ -4,8 +4,8 @@ from .text import WriterText
 
 
 class InputLine:
-    def __init__(self, link, carrot):
-        self.link = link
+    def __init__(self, parent, carrot):
+        self.parent = parent
         self.carrot = carrot
         self.new_text()
 
@@ -37,7 +37,7 @@ class InputLine:
 
     def event_keydown(self, event):
         self.carrot.show = True
-        self.link.timer.reset()
+        self.parent.timer.reset()
 
         ctrl = event.mod & pygame.KMOD_CTRL
         if ctrl == 0 and 31 < event.key < 127:

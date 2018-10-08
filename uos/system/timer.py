@@ -1,84 +1,68 @@
 import pygame
 from .variables import UOS_Variables
 
-class UOS_Timer:
-    ticks = 0
-    delta = 0
-    delay_tick = 0
-
-    @classmethod
-    def tick(cls):
-        ticks = pygame.time.get_ticks()
-        cls.delta = ticks - cls.ticks
-        cls.ticks = ticks
-
-    @classmethod
-    def delay(cls, tick):
-        cls.delay_tick = tick
-
-    def __init__(self):
-        self.timers = {}
-        self.id = 0
-
-    def __call__(self, interval, callback, callback_fast=None, pydata=None):
-        timer = TickTimer(self.id, interval, callback, callback_fast, pydata)
-        self.timers[self.id] = timer
-        self.id += 1
-        return timer
-
-    def update(self, bypass=False):
-        if UOS_Timer.delay_tick > 0 and not bypass:
-            UOS_Timer.delay_tick -= UOS_Timer.delta
-            for timer in self.timers.values():
-                timer.idle()
-        else:
-            for timer in self.timers.values():
-                timer.update()
-
-    def reset(self):
-        for timer in self.timers.values():
-            timer.reset()
-
-class TickTimer:
-    def __init__(self, id, interval, callback, callback_fast=None, pydata=None):
-        self.id = id
-        self.next_tick = UOS_Timer.ticks + interval
+class TickTimerData:
+    def __init__(self, parent, interval, callback , pydata):
+        self.parent = parent
+        self.next_tick = parent.ticks + interval
+        self.identity = parent.identity
         self.interval = interval
         self.callback = callback
-        self.callback_fast = callback_fast
         self.pydata = pydata
         self.stop = False
+        self.count = 0
+
+    def add(self):
+        self.parent.timers[self.identity] = self
+
+    def pop(self):
+        self.parent.pop(self.identity)
 
     def reset(self):
-        self.next_tick = UOS_Timer.ticks
-        self.update_next_tick()
+        self.next_tick = self.parent.ticks + self.interval
 
     def restart(self):
         self.stop = False
-        self.next_tick = UOS_Timer.ticks
-        self.update_next_tick()
-
-    def idle(self):
-        self.next_tick += UOS_Timer.delta
+        self.reset()
 
     def update(self):
         if not self.stop:
-            if UOS_Timer.ticks > self.next_tick:
-                # avoid infinite loop
-                if self.interval != 0:
-                    while UOS_Timer.ticks > self.next_tick:
-                        self.update_next_tick()
+            self.count = 0
+            # avoid infinite loop
+            if self.interval != 0:
+                while self.parent.ticks > self.next_tick:
+                    if self.interval < 0:
+                        self.next_tick += UOS_Variables.interval
+                    else:
+                        self.next_tick += self.interval
+                    self.count += 1
 
-                        if self.callback_fast:
-                            self.callback_fast(self)
-
+            if self.count > 0 or self.interval == 0:
                 self.callback(self)
 
-    def update_next_tick(self):
-        if self.interval < 0:
-            self.next_tick += UOS_Variables.interval
-        else:
-            self.next_tick += self.interval
+class UOS_TickTimer:
+    def __init__(self):
+        self.ticks = pygame.time.get_ticks()
+        self.identity = 0
+        self.timers = {}
 
-    def __str__(self):
-        return 'Timer' + str(self.__dict__)
+    def __call__(self, interval, callback, pydata=None):
+        timer = TickTimerData(self, interval, callback, pydata)
+        self.timers[self.identity] = timer
+        self.identity += 1
+        return timer
+
+    def pop(self, identity):
+        del self.timers[identity]
+
+    def reset(self):
+        for key in self.timers.keys():
+            self.timers[key].reset()
+
+    def tick(self):
+        self.ticks = pygame.time.get_ticks()
+
+    def update(self):
+        self.ticks = pygame.time.get_ticks()
+        for key in self.timers.keys():
+            self.timers[key].update()

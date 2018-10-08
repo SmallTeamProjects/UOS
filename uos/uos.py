@@ -6,27 +6,26 @@ from .system import *
 class UOS:
     UOS_User.variable_setup()
 
-    Screen = UOS_Screen
     Drive = UOS_Drive
     State = UOS_State
-    Timer = UOS_Timer
     User = UOS_User
     Data = UOS_Data
     Variables = UOS_Variables
-    sounds = UOS_Sounds()
 
     @classmethod
     def get_interval(cls):
         return cls.Variables.interval
 
     @classmethod
-    def run(cls):
-        cls.Screen.loop(30)
+    def run(cls, state):
+        UOS_StateMachine.main_loop(state)
 
     @classmethod
     def setup(cls):
-        cls.Screen.center()
-        cls.Screen.create('UOS', (512, 384))
+        UOS_StateMachine.screen_center()
+        UOS_StateMachine.create('UOS', 512, 384)
+        pygame.key.set_repeat(80,80)
+        cls.sounds = UOS_Sounds()
         cls.Drive.setup()
         cls.User.load()
         cls.text = UOS_Text()

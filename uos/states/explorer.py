@@ -11,7 +11,7 @@ class ExplorerBase:
         self.boolean_folder = boolean_folder
         self.dir = UOS.User.rootpath()
         self.start_dir = self.dir
-        if UOS.User.current.group in ['admin', 'maintainence']:
+        if UOS.User.has_privilege():
             self.stop_dir =  UOS.Drive.Path.DRIVE
         else:
             self.stop_dir =  self.start_dir
@@ -20,7 +20,7 @@ class ExplorerBase:
 
     def call_back(self):
         if self.dir in [self.start_dir, self.stop_dir]:
-            self.menu.last_state()
+            self.menu.state.flip_back()
         else:
             self.dir = os.path.split(self.dir)[0]
             self.create_menu()
@@ -41,22 +41,15 @@ class ExplorerBase:
             elif not self.boolean_folder:
                 items.append('[ {0} ]'.format(string))
 
-        items.append('[ ^Back ]')
-        items.append('[ ^Exit ]')
+        items.append('[ < Back ]')
+        items.append('[ < Exit ]')
         self.menu.strings = items
         self.menu.select = 0
         self.menu.writer.clear(0)
         self.menu.display_string()
 
-    def get_exit_state(self):
-        state = self.menu
-        while state.get_last_state():
-            state = state.get_last_state()
-
-        return state
-
     def exit_state(self):
-        UOS.State.flip_state = self.get_exit_state()
+        self.menu.state.flip('Terminal')
 
 class ExplorerCreate(ExplorerBase):
     def __init__(self, menu, boolean_folder):
@@ -86,9 +79,9 @@ class ExplorerRead(ExplorerBase):
     def call_selection(self):
         item = self.menu.strings[self.menu.select].lstrip('[ > ').rstrip(' ]')
         path = os.path.join(self.dir, item)
-        if item == '^Back':
-            UOS.State.flip_state = self.menu._state.track
-        elif item == '^Exit':
+        if item == '< Back':
+            self.menu.state.flip_back()
+        elif item == '< Exit':
             self.exit_state()
         elif item == '..':
             self.dir = os.path.split(self.dir)[0]

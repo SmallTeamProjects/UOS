@@ -5,15 +5,15 @@ from ..writer import Writer
 class Terminal(UOS.State):
     def __init__(self):
         UOS.State.__init__(self)
-        self.writer = Writer(self.timer)
+        self.writer = Writer(self.state)
         if UOS.User.has_admin:
             x = 10
             y = 10
-            w = UOS.Screen.rect.w - x * 2
+            w = self.state.machine.rect.w - x * 2
             rect = pygame.Rect(x, y, w, UOS.text.get_linesize())
             self.writer.add_output(rect)
             y += UOS.text.get_linesize()
-            rect = pygame.Rect(x, y, w, UOS.Screen.rect.bottom - y)
+            rect = pygame.Rect(x, y, w, self.state.machine.rect.bottom - y)
             self.writer.add_input(rect)
             self.writer.add(0, 'Welcome to ROBCO Industries (TM) Termlink')
         else:
@@ -24,7 +24,7 @@ class Terminal(UOS.State):
                                 insert_after=item.insert_after,
                                 update_after=item.update_after)
 
-    def entrance(self, args):
+    def entrance(self):
         self.writer.flush()
 
     def color_change(self):

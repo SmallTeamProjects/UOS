@@ -69,9 +69,9 @@ class WriterText:
             else:
                 self.update_finish = True
 
-    def callback_fast(self, timer):
+    def callback(self, timer):
         if not self.is_finish(True):
-            self.pos += 1
+            self.pos += timer.count
             if isinstance(self.interval, tuple):
                 if self.interval_change:
                     if self.interval_pos < len(self.interval_change):
@@ -89,11 +89,13 @@ class WriterText:
                     if self.insert_pos == -1:
                         timer.interval = interval
 
-                    if self.insert_pos < len(text):
-                        self.buffer[start + self.insert_pos] = text[self.insert_pos]
-                        self.insert_pos += 1
-                    else:
-                        self.insert_finish = True
+                    for i in range(timer.count):
+                        if self.insert_pos < len(text):
+                            self.buffer[start + self.insert_pos] = text[self.insert_pos]
+                            self.insert_pos += 1
+                        else:
+                            self.insert_finish = True
+                            break
 
     def extend(self, text):
         self.buffer.extend(text.buffer)

@@ -20,14 +20,13 @@ class WriterHandler:
             self.next_line()
 
     def callback(self, timer):
-        if self.current:
-            self.current.updated = False
-
-    def callback_fast(self, timer):
         if self.update:
             self.current.callback_after(timer)
         elif self.current:
-            self.current.callback_fast(timer)
+            self.current.callback(timer)
+
+        if self.current:
+            self.current.updated = False
 
     def is_finish(self):
         return self.current is None
@@ -63,7 +62,7 @@ class WriterHandler:
         if self.current:
             if not self.update:
                 self.current.render(surface, position)
-                
+
             if self.current.newline:
                 position[0] = left
                 position[1] += linesize
