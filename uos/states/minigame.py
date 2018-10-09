@@ -61,19 +61,20 @@ class MinigameBase(UOS.State):
                         boolean_good = True
                         break
 
-                        if boolean_good:
-                            break
+            if boolean_good:
+                break
 
-                            if position:
-                                self.highlight_images = []
-                                x = self.writer.blocks[self.carrot.block].rect.left - 8
-                                y = self.writer.blocks[self.carrot.block].rect.top
-                                for pline, p in zip(position['line'], position['pos']):
-                                    text = self.display_buffer[pline][p[0]:p[1]]
-                                    pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline % 16) + y
-                                    self.highlight_images.append((UOS.text(text, (0,0,0), UOS.text.get_color()), pos))
-                                else:
-                                    self.highlight_images = None
+        self.carrot.hposition = position
+        if position:
+            self.highlight_images = []
+            x = self.writer.blocks[self.carrot.block].rect.left - 8
+            y = self.writer.blocks[self.carrot.block].rect.top
+            for pline, p in zip(position['line'], position['pos']):
+                text = self.display_buffer[pline][p[0]:p[1]]
+                pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline % 16) + y
+                self.highlight_images.append((UOS.text(text, (0,0,0), UOS.text.get_color()), pos))
+        else:
+            self.highlight_images = None
 
     def color_change(self):
         self.create_tab_exit()
@@ -111,6 +112,7 @@ class MinigameBase(UOS.State):
 
             self.generate_display()
             self.display_string()
+            self.carrot_hposition = None
             self.carrot.show = False
             self.carrot.init = False
             self.carrot.block = 1
@@ -162,6 +164,16 @@ class MinigameBase(UOS.State):
 
     def event_update_pos(self, inc):
         UOS.sounds.play('scroll')
+        if self.carrot.hposition:
+            for line, pos in zip(self.carrot.hposition['line'], self.carrot.hposition['pos']):
+                i = (self.carrot.block - 1) * 16
+                if self.carrot.line + i == line:
+                    if inc > 0:
+                        self.carrot.pos = pos[1] - 1
+                    else:
+                        self.carrot.pos = pos[0]
+                    break
+
         self.carrot.pos += inc
         if self.carrot.pos > 11 or self.carrot.pos < 0:
             self.event_update_block()
