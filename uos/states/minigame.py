@@ -52,22 +52,115 @@ class MinigameBase(UOS.State):
         self.tab_rect.y = self.state.machine.rect.bottom - h - 4
         self.tab_rect.centerx = self.state.machine.rect.centerx
 
-    def call_selection(self):
-        pass
-
     def attempts_remaining(self, count):
         debug_text = 'Attempts Remaining:'
         for x in range(count):
             debug_text += ' \x7f'
         return debug_text
 
-    def generate_outline(self, index, hex_seed, count):
-        hex_num = hex_seed
-        i = (index - 1) * 16
-        for x in range(count):
-            self.writer.add(index, hex(hex_num).upper() + ' ............', 20,
-                update_after = (20, 7, self.display_buffer[x + i]))
-            hex_num += 12
+    def call_selection(self):
+        pass
+
+    def carrot_highlight_words(self):
+        position = None
+        boolean_good = False
+        line = self.carrot.line + (self.carrot.block - 1) * 16
+        for pos in self.highlight_position:
+            for pline, p in zip(pos['line'], pos['pos']):
+                if pline == line:
+                    if p[0] <= self.carrot.pos < p[1]:
+                        position = pos
+                        boolean_good = True
+                        break
+
+                        if boolean_good:
+                            break
+
+                            if position:
+                                self.highlight_images = []
+                                x = self.writer.blocks[self.carrot.block].rect.left - 8
+                                y = self.writer.blocks[self.carrot.block].rect.top
+                                for pline, p in zip(position['line'], position['pos']):
+                                    text = self.display_buffer[pline][p[0]:p[1]]
+                                    pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline % 16) + y
+                                    self.highlight_images.append((UOS.text(text, (0,0,0), UOS.text.get_color()), pos))
+                                else:
+                                    self.highlight_images = None
+
+    def display_string(self):
+        self.writer.add(0, self.header)
+        self.writer.add(0, "Password Required")
+        self.writer.add(0, self.attempts_remaining(self.attempts))
+        self.generate_outline(1, self.hex_seed, 16)
+        self.generate_outline(2, self.hex_seed + 192, 16)
+        # temporary section
+        self.writer.add(3, '> CABINET')
+        self.writer.add(3, '> Entry denied.')
+        self.writer.add(3, '> Likeness=0')
+
+    def entrance(self, regain_focus):
+        if not regain_focus:
+            for i in range(4):
+                self.writer.clear(i)
+
+            self.generate_display()
+            self.display_string()
+            self.carrot.show = False
+            self.carrot.init = False
+            self.carrot.block = 1
+            self.carrot.line = 0
+            self.carrot.pos = 0
+            self.carrot.width = self.text_width * 8
+            self.carrot.topleft = [self.carrot.width, self.top_height]
+            self.highlight_images = None
+
+        self.writer.flush()
+        self.select = 0
+
+    def event(self, event):
+        if self.writer.is_finish():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    self.event_update_line(1)
+
+                elif event.key == pygame.K_UP:
+                    self.event_update_line(-1)
+
+                elif event.key == pygame.K_LEFT:
+                    self.event_update_pos(-1)
+
+                elif event.key == pygame.K_RIGHT:
+                    self.event_update_pos(1)
+
+                elif event.key == pygame.K_RETURN:
+                    UOS.sounds.play('password', 'attempt')
+                    # todo get selected word
+
+                elif event.key == pygame.K_TAB:
+                    self.state.flip_back()
+
+    def event_update_block(self):
+        self.carrot.block = self.carrot.block % 2 + 1
+        self.carrot.topleft[0] = self.writer.blocks[self.carrot.block].rect.left
+        self.carrot.topleft[0] += self.carrot.width - 8
+
+    def event_update_line(self, inc):
+        UOS.sounds.play('scroll')
+        self.carrot.line += inc
+        if self.carrot.line > 15 or self.carrot.line < 0:
+            self.event_update_block()
+        self.carrot.line %= 16
+        height = self.writer.blocks[self.carrot.block].rect.top
+        self.carrot.topleft[1] = height + UOS.text.get_linesize() * self.carrot.line
+        self.update_carrot_data()
+
+    def event_update_pos(self, inc):
+        UOS.sounds.play('scroll')
+        self.carrot.pos += inc
+        if self.carrot.pos > 11 or self.carrot.pos < 0:
+            self.event_update_block()
+        self.carrot.pos %= 12
+        self.update_carrot_data()
 
     # randomizes world locations, returns 2d array with paired index and word
     def find_places(self,words,difficulty,characters):
@@ -147,77 +240,13 @@ class MinigameBase(UOS.State):
                 # (line number, position), (line number, position)
                 self.highlight_position.append({'line':(dx,dy), 'pos':(p1,p2)})
 
-    def carrot_highlight_words(self):
-        position = None
-        boolean_good = False
-        line = self.carrot.line + (self.carrot.block - 1) * 16
-        for pos in self.highlight_position:
-            for pline, p in zip(pos['line'], pos['pos']):
-                if pline == line:
-                    if p[0] <= self.carrot.pos < p[1]:
-                        position = pos
-                        boolean_good = True
-                        break
-
-            if boolean_good:
-                break
-
-        if position:
-            self.highlight_images = []
-            x = self.writer.blocks[self.carrot.block].rect.left - 8
-            y = self.writer.blocks[self.carrot.block].rect.top
-            for pline, p in zip(position['line'], position['pos']):
-                text = self.display_buffer[pline][p[0]:p[1]]
-                pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline % 16) + y
-                self.highlight_images.append((UOS.text(text, (0,0,0), UOS.text.get_color()), pos))
-        else:
-            self.highlight_images = None
-
-    # highlight bracket sets
-    def highlight_bracket_set(self,lines):
-        openers = ['(','[','{','<']
-        closers = [')',']','}','>']
-        sets = []
-        index = 0
-        # iterates over each line to find sets
-        for x in range(len(lines)):
-            for j in range(len(lines[x])):
-                letter = lines[x][j]
-                if letter in openers >=0:
-                    br_index = letter in openers
-                    queue = lines[x:j]  # not sure if this is right
-                    if closers[br_index] in queue > 0:
-                        end_index = closers[br_index] in queue
-                        snippet = queue[0:end_index + 1]
-                        # supposed to check for letters
-                        if any((c in string.ascii_uppercase) for c in snippet):
-                            index +=1
-                        else:
-                            sets.append([index, index + end_index, snippet])
-
-    # handle selection highlighting
-    def change_selection(self):
-        select = self.select
-        # todo
-        # if a letter in a word is selected, highlights and selects the whole word
-        # print current selection to the input line without committing it to writer queue
-        # if at the edge of a column move to next column
-
-    # runs bracket functions
-    def hack(self):
-        roll = randint(0,4)
-        if roll == 4:
-            self.reset_tries()
-        else:
-            self.remove_dud()
-
-    # sets attempts back to 4
-    def reset_tries(self):
-        self.attempts = 4
-
-    # removes dud
-    def remove_dud(self):
-        UOS.sounds.play('dud')
+    def generate_outline(self, index, hex_seed, count):
+        hex_num = hex_seed
+        i = (index - 1) * 16
+        for x in range(count):
+            self.writer.add(index, hex(hex_num).upper() + ' ............', 20,
+                update_after = (20, 7, self.display_buffer[x + i]))
+            hex_num += 12
 
     # gets character likeness
     def get_likeness(self, word, visible=True):
@@ -258,80 +287,39 @@ class MinigameBase(UOS.State):
                     found = True
         return words
 
-    def display_string(self):
-        self.writer.add(0, self.header)
-        self.writer.add(0, "Password Required")
-        self.writer.add(0, self.attempts_remaining(self.attempts))
-        self.generate_outline(1, self.hex_seed, 16)
-        self.generate_outline(2, self.hex_seed + 192, 16)
-        # temporary section
-        self.writer.add(3, '> CABINET')
-        self.writer.add(3, '> Entry denied.')
-        self.writer.add(3, '> Likeness=0')
+    # runs bracket functions
+    def hack(self):
+        roll = randint(0,4)
+        if roll == 4:
+            self.reset_tries()
+        else:
+            self.remove_dud()
 
-    def entrance(self, regain_focus):
-        if not regain_focus:
-            for i in range(4):
-                self.writer.clear(i)
+    # highlight bracket sets
+    def highlight_bracket_set(self,lines):
+        openers = ['(','[','{','<']
+        closers = [')',']','}','>']
+        sets = []
+        index = 0
+        # iterates over each line to find sets
+        for x in range(len(lines)):
+            for j in range(len(lines[x])):
+                letter = lines[x][j]
+                if letter in openers >=0:
+                    br_index = letter in openers
+                    queue = lines[x:j]  # not sure if this is right
+                    if closers[br_index] in queue > 0:
+                        end_index = closers[br_index] in queue
+                        snippet = queue[0:end_index + 1]
+                        # supposed to check for letters
+                        if any((c in string.ascii_uppercase) for c in snippet):
+                            index +=1
+                        else:
+                            sets.append([index, index + end_index, snippet])
 
-            self.generate_display()
-            self.display_string()
-            self.carrot.show = False
-            self.carrot.init = False
-            self.carrot.block = 1
-            self.carrot.line = 0
-            self.carrot.pos = 0
-            self.carrot.width = self.text_width * 8
-            self.carrot.topleft = [self.carrot.width, self.top_height]
-            self.highlight_images = None
-
-        self.writer.flush()
-        self.select = 0
-
-    def event(self, event):
-        if self.writer.is_finish():
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    self.event_update_line(1)
-
-                elif event.key == pygame.K_UP:
-                    self.event_update_line(-1)
-
-                elif event.key == pygame.K_LEFT:
-                    self.event_update_pos(-1)
-
-                elif event.key == pygame.K_RIGHT:
-                    self.event_update_pos(1)
-
-                elif event.key == pygame.K_RETURN:
-                    UOS.sounds.play('password', 'attempt')
-                    # todo get selected word
-
-                elif event.key == pygame.K_TAB:
-                    self.state.flip_back()
-
-    def event_update_block(self):
-        self.carrot.block = self.carrot.block % 2 + 1
-        self.carrot.topleft[0] = self.writer.blocks[self.carrot.block].rect.left
-        self.carrot.topleft[0] += self.carrot.width - 8
-
-    def event_update_line(self, inc):
-        UOS.sounds.play('scroll')
-        self.carrot.line += inc
-        if self.carrot.line > 15 or self.carrot.line < 0:
-            self.event_update_block()
-        self.carrot.line %= 16
-        height = self.writer.blocks[self.carrot.block].rect.top
-        self.carrot.topleft[1] = height + UOS.text.get_linesize() * self.carrot.line
-        self.update_carrot_data()
-
-    def event_update_pos(self, inc):
-        UOS.sounds.play('scroll')
-        self.carrot.pos += inc
-        if self.carrot.pos > 11 or self.carrot.pos < 0:
-            self.event_update_block()
-        self.carrot.pos %= 12
-        self.update_carrot_data()
+    # removes dud
+    def remove_dud(self):
+        UOS.sounds.play('dud')
 
     def render(self, surface):
         if self.writer.is_finish() and not self.carrot.init:
@@ -354,6 +342,10 @@ class MinigameBase(UOS.State):
     def render_text(self, text):
         return UOS.text(text, (0,0,0), UOS.text.get_color())
 
+    # sets attempts back to 4
+    def reset_tries(self):
+        self.attempts = 4
+
     def update_carrot_data(self):
         self.carrot_highlight_words()
         i = (self.carrot.block - 1) * 16
@@ -370,6 +362,6 @@ class Minigame(MinigameBase):
     def __init__(self):
         MinigameBase.__init__(self, 4)  # initialize class
         self.strings = ('')
-        
+
     def call_selection(self):
         self.state.flip_back()  # placeholder
