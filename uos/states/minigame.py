@@ -258,7 +258,6 @@ class MinigameBase(UOS.State):
                     found = True
         return words
 
-
     def display_string(self):
         self.writer.add(0, self.header)
         self.writer.add(0, "Password Required")
@@ -270,18 +269,24 @@ class MinigameBase(UOS.State):
         self.writer.add(3, '> Entry denied.')
         self.writer.add(3, '> Likeness=0')
 
-    def entrance(self):
+    def entrance(self, regain_focus):
+        if not regain_focus:
+            for i in range(4):
+                self.writer.clear(i)
+
+            self.generate_display()
+            self.display_string()
+            self.carrot.show = False
+            self.carrot.init = False
+            self.carrot.block = 1
+            self.carrot.line = 0
+            self.carrot.pos = 0
+            self.carrot.width = self.text_width * 8
+            self.carrot.topleft = [self.carrot.width, self.top_height]
+            self.highlight_images = None
+
         self.writer.flush()
         self.select = 0
-
-        self.carrot.show = False
-        self.carrot.init = False
-        self.carrot.block = 1
-        self.carrot.line = 0
-        self.carrot.pos = 0
-        self.carrot.width = self.text_width * 8
-        self.carrot.topleft = [self.carrot.width, self.top_height]
-        self.highlight_images = None
 
     def event(self, event):
         if self.writer.is_finish():
@@ -303,11 +308,6 @@ class MinigameBase(UOS.State):
                     # todo get selected word
 
                 elif event.key == pygame.K_TAB:
-                    for i in range(4):
-                        self.writer.clear(i)
-
-                    self.generate_display()
-                    self.display_string()
                     self.state.flip_back()
 
     def event_update_block(self):
@@ -370,8 +370,6 @@ class Minigame(MinigameBase):
     def __init__(self):
         MinigameBase.__init__(self, 4)  # initialize class
         self.strings = ('')
-
-        self.display_string()
-
+        
     def call_selection(self):
         self.state.flip_back()  # placeholder

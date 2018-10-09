@@ -15,14 +15,14 @@ class UOS_StateMethods:
     def flip_back(self, *args, **kwargs):
         self.machine.next_state = self.previous_state, args, kwargs
 
-    def screen_entrance(self, previous_state, *args, **kwargs):
+    def screen_entrance(self, regain_focus, previous_state, *args, **kwargs):
         if previous_state:
             self.previous_state = previous_state
 
         self.timer.tick()
         self.timer.reset()
         self.parent.__dict__.update(kwargs)
-        self.parent.entrance(*args)
+        self.parent.entrance(regain_focus, *args)
 
     def screen_render(self, surface):
         self.parent.render(surface)
@@ -58,7 +58,7 @@ class UOS_State:
     def drop(self):
         pass
 
-    def entrance(self):
+    def entrance(self, regain_focus):
         pass
 
     def event(self, event):

@@ -11,7 +11,7 @@ class Idle(UOS.State):
     def color_change(self):
         self.writer.color_change()
 
-    def entrance(self, *args):
+    def entrance(self, regain_focus):
         self.state.machine.idle_timer.stop = True
         UOS.Variables.idle = True
 

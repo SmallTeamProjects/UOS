@@ -41,13 +41,16 @@ class UOS_StateMachine:
                 if isinstance(self.next_state[0], UOS_State):
                     self.current_state, args, kwargs = self.next_state
                     previous_state = None
+                    regain_focus = True
                 else:
                     state_name, args, kwargs = self.next_state
                     previous_state = self.current_state
                     self.current_state = self.instances[state_name]
+                    regain_focus = False
 
                 # start the next state
-                self.current_state.state.screen_entrance(previous_state, *args, **kwargs)
+                self.current_state.state.screen_entrance(regain_focus,
+                    previous_state, *args, **kwargs)
                 self.next_state = None
 
             for event in pygame.event.get():

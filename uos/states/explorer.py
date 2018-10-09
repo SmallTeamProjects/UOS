@@ -98,7 +98,7 @@ class Explorer(MenuBase):
         self.strings = []
         self.last_args = None
 
-    def entrance(self, action, boolean_folder=False):
+    def entrance(self, regain_focus, action, boolean_folder=False):
         if action:
             self.last_args = [action, boolean_folder]
         elif self.last_args:

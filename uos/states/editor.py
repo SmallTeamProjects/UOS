@@ -12,7 +12,7 @@ class Editor(UOS.State):
         UOS.State.__init__(self)
         self.editor = TextEditor(self, self.state.machine.rect.inflate(-16, -16), 2)
 
-    def entrance(self, filename, load=False):
+    def entrance(self, regain_focus, filename, load=False):
         if filename:
             if load:
                 self.editor.load(filename)

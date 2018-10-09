@@ -34,7 +34,7 @@ class MenuBase(UOS.State):
         self.writer.add_empty(0, 2)
         self.writer.add(0, self.strings)
 
-    def entrance(self, *args):
+    def entrance(self, regain_focus):
         self.writer.flush()
         self.select = 0
 

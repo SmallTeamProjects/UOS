@@ -14,7 +14,7 @@ class Loading(UOS.State):
                             insert_after=item.insert_after,
                             update_after=item.update_after)
 
-    def entrance(self):
+    def entrance(self, regain_focus):
         self.writer.flush()
 
     def event(self, event):
