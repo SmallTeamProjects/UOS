@@ -13,25 +13,19 @@ class MinigameBase(UOS.State):
         self.writer = Writer(self.state)
         h = UOS.text.get_linesize()
         w = self.state.machine.rect.w
-        top_height = h * 4 - 4
+        self.top_height = h * 4 - 4
         bottom_height = h * 16
         # header
         self.writer.add_output(pygame.Rect(8, 8, w, h * 3))
         # body1
-        self.writer.add_output(pygame.Rect(8, top_height, 186, bottom_height))
+        self.writer.add_output(pygame.Rect(8, self.top_height, 186, bottom_height))
         # body2
-        self.writer.add_output(pygame.Rect(188, top_height, 186, bottom_height))
+        self.writer.add_output(pygame.Rect(188, self.top_height, 186, bottom_height))
         # body3
-        self.writer.add_input(pygame.Rect(364, top_height, 140, bottom_height), True, 0, True)
+        self.writer.add_input(pygame.Rect(364, self.top_height, 140, bottom_height), True, 0, True)
         # configuration variables
         self.text_width = UOS.text.width(' ')
         self.carrot = Carrot()
-        self.carrot.show = False
-        self.carrot.init = False
-        self.carrot.block = 1
-        self.carrot.line = 0
-        self.carrot.width = self.text_width * 8
-        self.carrot.topleft = [self.carrot.width, top_height]
 
         self.header = 'temp header'
         self.hex_seed = randint(4096, 65535)
@@ -280,6 +274,14 @@ class MinigameBase(UOS.State):
         self.writer.flush()
         self.select = 0
 
+        self.carrot.show = False
+        self.carrot.init = False
+        self.carrot.block = 1
+        self.carrot.line = 0
+        self.carrot.pos = 0
+        self.carrot.width = self.text_width * 8
+        self.carrot.topleft = [self.carrot.width, self.top_height]
+        self.highlight_images = None
 
     def event(self, event):
         if self.writer.is_finish():
@@ -301,6 +303,11 @@ class MinigameBase(UOS.State):
                     # todo get selected word
 
                 elif event.key == pygame.K_TAB:
+                    for i in range(4):
+                        self.writer.clear(i)
+
+                    self.generate_display()
+                    self.display_string()
                     self.state.flip_back()
 
     def event_update_block(self):
@@ -340,9 +347,9 @@ class MinigameBase(UOS.State):
             surface.blit(self.tab_exit, self.tab_rect)
             surface.blit(self.brackets, self.brackets_rect)
 
-        if self.highlight_images:
-            for image, pos in self.highlight_images:
-                surface.blit(image, pos)
+            if self.highlight_images:
+                for image, pos in self.highlight_images:
+                    surface.blit(image, pos)
 
     def render_text(self, text):
         return UOS.text(text, (0,0,0), UOS.text.get_color())
