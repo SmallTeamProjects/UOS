@@ -38,19 +38,7 @@ class MinigameBase(UOS.State):
         self.words = []
         self.places = []
         self.select = 0
-        self.generate_display()
-
-        self.brackets = UOS.text('[        ]')
-        self.brackets_rect = self.brackets.get_rect()
-        bracket_height = int(h * 1.5)
-        self.brackets = pygame.transform.scale(self.brackets, (self.brackets_rect.w, bracket_height))
-        self.brackets_rect.y = self.state.machine.rect.bottom - bracket_height - 2
-        self.brackets_rect.centerx = self.state.machine.rect.centerx
-
-        self.tab_exit = UOS.text('Tab)EXIT')
-        self.tab_rect = self.tab_exit.get_rect()
-        self.tab_rect.y = self.state.machine.rect.bottom - h - 4
-        self.tab_rect.centerx = self.state.machine.rect.centerx
+        self.create_tab_exit()
 
     def attempts_remaining(self, count):
         debug_text = 'Attempts Remaining:'
@@ -86,6 +74,24 @@ class MinigameBase(UOS.State):
                                     self.highlight_images.append((UOS.text(text, (0,0,0), UOS.text.get_color()), pos))
                                 else:
                                     self.highlight_images = None
+
+    def color_change(self):
+        self.create_tab_exit()
+        self.writer.color_change()
+
+    def create_tab_exit(self):
+        self.brackets = UOS.text('[        ]')
+        self.brackets_rect = self.brackets.get_rect()
+        h = UOS.text.get_linesize()
+        bracket_height = int(h * 1.5)
+        self.brackets = pygame.transform.scale(self.brackets, (self.brackets_rect.w, bracket_height))
+        self.brackets_rect.y = self.state.machine.rect.bottom - bracket_height - 2
+        self.brackets_rect.centerx = self.state.machine.rect.centerx
+
+        self.tab_exit = UOS.text('Tab)EXIT')
+        self.tab_rect = self.tab_exit.get_rect()
+        self.tab_rect.y = self.state.machine.rect.bottom - h - 4
+        self.tab_rect.centerx = self.state.machine.rect.centerx
 
     def display_string(self):
         self.writer.add(0, self.header)

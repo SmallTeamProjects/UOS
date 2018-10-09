@@ -47,7 +47,7 @@ class Commands:
             if not cls.cat_command(text, cls.group_admin, cls.admin):
                 if not cls.cat_command(text, cls.group_user, cls.user):
                     if not cls.default_command(text):
-                        writer.add('ERROR_INVALID_FUNCTION', 30)
+                        self.link.writer.add('ERROR_INVALID_FUNCTION', 30)
 
     @staticmethod
     def call_args(key, text):
@@ -85,7 +85,7 @@ class Commands:
         #print(error)
         if error[0].startswith('command_'):
             error[0] = error[0][8:]
-            
+
         c = error[0].rstrip('()').upper()
         if '_' in c:
             c = ' '.join(c.split('_'))
