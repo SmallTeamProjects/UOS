@@ -232,6 +232,6 @@ words = {
 }
 
 
-def get_list(key, word_count):
+def get_random_wordlist(key, word_count):
     shuffle(words[key])
     return words[key][:word_count]

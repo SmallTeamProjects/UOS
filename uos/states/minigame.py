@@ -1,10 +1,12 @@
 import pygame
 import math
 import string
-from random import randint, random, choice, shuffle
+from types import SimpleNamespace
+from random import randint, random, choice
 from ..uos import UOS
 from ..writer import Writer
 from ..writer.carrot import Carrot
+from ..system.words import get_random_wordlist
 
 
 class MinigameBase(UOS.State):
@@ -34,9 +36,7 @@ class MinigameBase(UOS.State):
         self.line_length = 12
         self.lines = 32
         self.characters = self.line_length * self.lines
-        self.secret_word = 'APPLE'
-        self.words = []
-        self.places = []
+        self.secret_word = None
         self.select = 0
         self.create_tab_exit()
 
@@ -203,34 +203,49 @@ class MinigameBase(UOS.State):
     # creates the full grid by filling remaining space with junk
     def generate_display(self):
         self.display_buffer = ''
-        # temp words
-        random_words = ['APPLE', 'READY', 'WORLD', 'HELLO', 'FILED', 'JAMMED',
-                        'WALLS', 'BOXES', 'JUNK', 'MIRCO', 'CHIPS', 'COMS',
-                        'LISTS', 'FOLLOW', 'PRINT', 'WHILE', 'CLASS']
+        word_count = 100 // self.difficulty
+        random_words = get_random_wordlist(self.difficulty, word_count)
+        self.secret_word = choice(random_words)
 
-        shuffle(random_words)
-        max_junk = 34
-        min_junk = 24
-        word_count = 0
-        junk_count = min_junk + 1
-        x = 0
+        length = self.characters - word_count * self.difficulty
+        low = length // word_count // 2
+        junk = SimpleNamespace(
+            low = low,
+            mid = int(length // word_count // 1.5),
+            high = length // word_count,
+            count = low + 1,
+            word = 0,
+            offset = 0
+        )
 
         # remove . from punctuation
         hposition = []
         punctuation = string.punctuation
         punctuation = punctuation[:13] + punctuation[14:]
+
+        x = 0
         while x < self.characters:
-            if ((randint(0, 5) == 0 and junk_count > min_junk) or
-                 junk_count > max_junk) and word_count < 10:
-                self.display_buffer += random_words[word_count]
-                l = len(random_words[word_count])
-                hposition.append((x, x + l))
-                x += l
-                word_count += 1
-                junk_count = 0
+            boolean_good = False
+            if junk.word < word_count:
+                if junk.count > junk.low + junk.offset and randint(0, 25) == 0:
+                    junk.offset += 2
+                    boolean_good = True
+                elif junk.count > junk.mid + junk.offset and randint(0, 5) == 0:
+                    junk.offset += 1
+                    boolean_good = True
+                elif junk.count > junk.high:
+                    junk.offset -= 1
+                    boolean_good = True
+
+            if boolean_good:
+                self.display_buffer += random_words[junk.word]
+                hposition.append((x, x + self.difficulty))
+                x += self.difficulty
+                junk.word += 1
+                junk.count = 0
             else:
                 self.display_buffer += choice(punctuation)
-                junk_count += 1
+                junk.count += 1
                 x += 1
 
         # split into lines
