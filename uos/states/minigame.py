@@ -30,7 +30,7 @@ class MinigameBase(UOS.State):
         self.carrot = Carrot()
 
         self.header = 'temp header'
-        self.hex_seed = randint(4096, 65535)
+        self.hex_seed = 0
         self.attempts = attempts
         self.difficulty = 5
         self.line_length = 12
@@ -203,6 +203,7 @@ class MinigameBase(UOS.State):
     # creates the full grid by filling remaining space with junk
     def generate_display(self):
         self.display_buffer = ''
+        self.hex_seed = randint(4096, 65535)
         word_count = 100 // self.difficulty
         random_words = get_random_wordlist(self.difficulty, word_count)
         self.secret_word = choice(random_words)
