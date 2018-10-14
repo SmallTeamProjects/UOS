@@ -1,26 +1,102 @@
 import pygame
 from ..uos import UOS
 from ..writer import Writer
+from ..commands import Commands
 
+class SubMenu:
+    def __init__(self, parent, name, goto_menu):
+        self.name = '[ {} ]'.format(name)
+        self.goto_menu = goto_menu
+        self.parent = parent
 
-class MenuBase(UOS.State):
-    def __init__(self, header, padding=0):
+    def __call__(self):
+        self.parent.state.flip(self.goto_menu)
+
+class MenuCommand:
+    def __init__(self, parent, name, command):
+        self.name = '[ {} ]'.format(name)
+        self.command = command
+        self.parent = parent
+
+    def __call__(self):
+        Commands.call(self.parent, self.command, True)
+
+class MenuExplorer:
+    def __init__(self, parent, name, arg):
+        self.name = '[ {} ]'.format(name)
+        self.parent = parent
+        self.arg = arg
+
+    def __call__(self):
+        self.parent.state.flip('Explorer', self.arg)
+
+class MenuBack:
+    def __init__(self, parent):
+        self.name = '[ Back ]'
+        self.parent = parent
+
+    def __call__(self):
+        self.parent.state.flip_back()
+
+class MenuMenu(UOS.State):
+    user_name = None
+
+    # setup: Will make new states over the old ones
+    @classmethod
+    def setup(cls):
+        cls.user_name = UOS.User.name
+        menu = vars(UOS.User.current).get('menu', UOS.User.default_menu())
+        for key, items in menu.items():
+            menu = Menu(key, key)
+            menu.strings = []
+            for item in items:
+                if item[0] == 'SubMenu':
+                    menu.strings.append(SubMenu(menu, *item[1:]))
+                elif item[0] == 'Command':
+                    menu.strings.append(MenuCommand(menu, *item[1:]))
+                elif item[0] == 'Explorer':
+                    menu.strings.append(MenuExplorer(menu, *item[1:]))
+                else:
+                    print("Unknown menu command:", item)
+
+            menu.strings.append(MenuBack(menu))
+            menu.display_string()
+
+    def __init__(self):
         UOS.State.__init__(self)
-        self.rect = self.state.machine.rect.inflate(-16, -16)
-        self.writer = Writer(self.state)
-        self.writer.add_output(self.rect, padding)
+        self.regain_focus = False
+
+    def entrance(self, regain_focus):
+        self.regain_focus = regain_focus
+        if self.user_name != UOS.User.name:
+            MenuMenu.setup()
+
+    def update(self, ticks, delta):
+        if self.regain_focus:
+            self.state.flip_back()
+        else:
+            self.state.flip('MainMenu')
+
+class Menu(UOS.State):
+    def __init__(self, menu_name, header, padding=0):
+        UOS.State.__init__(self, menu_name)
         self.linesize = UOS.text.get_linesize(padding)
+        size = self.state.machine.rect.size
+        y = 8 + self.linesize * 2
+        self.rect = pygame.Rect(8, y, size[0] - 16,  size[1] - y)
+        self.writer = Writer(self.state)
+        # header
+        self.writer.add_output(pygame.Rect(8, 8, self.rect.w, self.linesize), padding)
+        # body
+        self.writer.add_output(self.rect, padding)
         self.header = header
         self.select = 0
-
-    def call_selection(self):
-        pass
 
     def create_highlighter(self):
         self.selection = []
         for string in self.strings:
             if string:
-                self.selection.append(self.render_text(string))
+                self.selection.append(self.render_text(string.name))
             else:
                 self.selection.append(None)
 
@@ -31,8 +107,7 @@ class MenuBase(UOS.State):
     def display_string(self):
         self.create_highlighter()
         self.writer.add(0, self.header)
-        self.writer.add_empty(0, 2)
-        self.writer.add(0, self.strings)
+        self.writer.add(1, [s.name for s in self.strings])
 
     def entrance(self, regain_focus):
         self.writer.flush()
@@ -63,84 +138,15 @@ class MenuBase(UOS.State):
 
                 elif event.key in [pygame.K_RETURN, pygame.K_RIGHT]:
                     UOS.sounds.play('enter')
-                    self.call_selection()
+                    self.strings[self.select]()
 
     def render(self, surface):
         surface.fill((0,0,0))
         self.writer.render(surface)
 
         if self.writer.is_finish():
-            position = self.rect.x, self.rect.y + self.linesize * (self.select + 3)
+            position = self.rect.x, self.rect.y + self.linesize * self.select
             surface.blit(self.selection[self.select], position)
 
     def render_text(self, text):
         return UOS.text(text, (0,0,0), UOS.text.get_color())
-
-
-class Menu(MenuBase):
-    @staticmethod
-    def setup():
-        Menu()
-        MenuColor()
-        MenuSetting()
-        MenuDocuments()
-
-    def __init__(self):
-        MenuBase.__init__(self, 'UOS Main Menu')
-        self.strings = ('[ Documents ]',
-                        '[ Settings ]',
-                        '[ Logout ]',
-                        '[ Shutdown ]',
-                        '[ Back ]')
-
-        self.display_string()
-
-    def call_selection(self):
-        if self.select == 0:
-            self.state.flip('MenuDocuments')
-        elif self.select == 1:
-            self.state.flip('MenuSetting')
-        elif self.select == 4:
-            self.state.flip_back()
-
-class MenuSetting(MenuBase):
-    def __init__(self):
-        MenuBase.__init__(self, 'UOS Setting Menu')
-        self.strings = ('[ > Terminal Color ]', '[ Back ]')
-        self.display_string()
-
-    def call_selection(self):
-        if self.select == 0:
-            self.state.flip('MenuColor')
-        elif self.select == 1:
-            self.state.flip_back()
-
-class MenuColor(MenuBase):
-    def __init__(self):
-        MenuBase.__init__(self, 'UOS Colors')
-        colors = ['[ {0} ]'.format(color.capitalize()) for color in UOS.text.get_colors()]
-        self.strings = (*colors, '[ Back ]')
-        self.display_string()
-
-    def call_selection(self):
-        if self.select < 3:
-            UOS.State.set_color(UOS.text.get_colors()[self.select])
-        elif self.select == 3:
-            self.state.flip_back()
-
-class MenuDocuments(MenuBase):
-    def __init__(self):
-        MenuBase.__init__(self, 'Documents Menu')
-        self.strings = ('[ Create ]',
-                        '[ > Read ]',
-                        '[ > Edit ]',
-                        '[ > Delete ]',
-                        '[ Back]')
-
-        self.display_string()
-
-    def call_selection(self):
-        if self.select == 1:
-            self.state.flip('Explorer', 'r')
-        elif self.select == 4:
-            self.state.flip_back()

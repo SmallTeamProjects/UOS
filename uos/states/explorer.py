@@ -1,26 +1,60 @@
 import os
 import pygame
-from .menu import MenuBase
+from .menu import Menu
 from ..uos import UOS
 
+class ExplorerFile:
+    def __init__(self, parent, name):
+        self.name = '[ {} ]'.format(name)
+        self.parent = parent
 
-class ExplorerBase:
-    def __init__(self, menu, header, boolean_folder):
-        self.menu = menu
-        self.menu.header = header
-        self.boolean_folder = boolean_folder
-        self.dir = UOS.User.rootpath()
-        self.start_dir = self.dir
-        if UOS.User.has_privilege():
-            self.stop_dir =  UOS.Drive.Path.DRIVE
-        else:
-            self.stop_dir =  self.start_dir
+    def __call__(self):
+        pass
 
-        self.create_menu()
+class ExplorerDir:
+    def __init__(self, parent, name):
+        self.name = '[ > {} ]'.format(name)
+        self.parent = parent
+        self.item = name
+
+    def __call__(self):
+        self.parent.dir_change(self.item)
+
+class ExplorerDirUp:
+    def __init__(self, parent):
+        self.name = '[ .. ]'
+        self.parent = parent
+
+    def __call__(self):
+        self.parent.dir_up()
+
+class ExplorerBack:
+    def __init__(self, parent):
+        self.name = '[ < Back ]'
+        self.parent = parent
+
+    def __call__(self):
+        self.parent.state.flip_back()
+
+class ExplorerExit:
+    def __init__(self, parent):
+        self.name = '[ < Exit ]'
+        self.parent = parent
+
+    def __call__(self):
+        self.parent.state.flip('Terminal')
+
+
+class Explorer(Menu):
+    def __init__(self):
+        Menu.__init__(self, 'Explorer', 'Explorer')
+        self.boolean_folder = False
+        self.action = None
+        self.strings = []
 
     def call_back(self):
         if self.dir in [self.start_dir, self.stop_dir]:
-            self.menu.state.flip_back()
+            self.state.flip_back()
         else:
             self.dir = os.path.split(self.dir)[0]
             self.create_menu()
@@ -28,89 +62,50 @@ class ExplorerBase:
     def create_menu(self):
         items = []
         if self.boolean_folder:
-            items = ['[ Select ]', None]
+            pass
+            #items = ['[ Select ]', None]
 
         if self.dir != self.stop_dir:
-            items.append('[ .. ]')
+            items.append(ExplorerDirUp(self))
 
         strings = os.listdir(self.dir)
         for string in strings:
             path = os.path.join(self.dir, string)
             if os.path.isdir(path):
-                items.append('[ > {0} ]'.format(string))
+                items.append(ExplorerDir(self, string))
             elif not self.boolean_folder:
-                items.append('[ {0} ]'.format(string))
+                items.append(ExplorerFile(self, string))
 
-        items.append('[ < Back ]')
-        items.append('[ < Exit ]')
-        self.menu.strings = items
-        self.menu.select = 0
-        self.menu.writer.clear(0)
-        self.menu.display_string()
+        items.append(ExplorerBack(self))
+        items.append(ExplorerExit(self))
+        self.strings = items
+        self.select = 0
+        self.writer.clear(0)
+        self.writer.clear(1)
+        self.display_string()
 
-    def exit_state(self):
-        self.menu.state.flip('Terminal')
-
-class ExplorerCreate(ExplorerBase):
-    def __init__(self, menu, boolean_folder):
-        ExplorerBase.__init__(self, menu, 'Explorer Create', boolean_folder)
-
-    def call_selection(self):
-        pass
-
-class ExplorerDelete(ExplorerBase):
-    def __init__(self, menu, boolean_folder):
-        ExplorerBase.__init__(self, menu, 'Explorer Delete', boolean_folder)
-
-    def call_selection(self):
-        pass
-
-class ExplorerEdit(ExplorerBase):
-    def __init__(self, menu, boolean_folder):
-        ExplorerBase.__init__(self, menu, 'Explorer Edit', boolean_folder)
-
-    def call_selection(self):
-        pass
-
-class ExplorerRead(ExplorerBase):
-    def __init__(self, menu, boolean_folder):
-        ExplorerBase.__init__(self, menu, 'Explorer Read', boolean_folder)
-
-    def call_selection(self):
-        item = self.menu.strings[self.menu.select].lstrip('[ > ').rstrip(' ]')
+    def dir_change(self, item):
         path = os.path.join(self.dir, item)
-        if item == '< Back':
-            self.menu.state.flip_back()
-        elif item == '< Exit':
-            self.exit_state()
-        elif item == '..':
-            self.dir = os.path.split(self.dir)[0]
-            self.create_menu()
-        elif os.path.isdir(path):
-            self.dir = path
-            self.create_menu()
-        elif os.path.isfile(path):
-            print(path)
+        self.dir = path
+        self.create_menu()
 
-class Explorer(MenuBase):
-    def __init__(self):
-        MenuBase.__init__(self, 'Explorer')
-        self.strings = []
-        self.last_args = None
+    def dir_up(self):
+        self.dir = os.path.split(self.dir)[0]
+        self.create_menu()
 
     def entrance(self, regain_focus, action, boolean_folder=False):
-        if action:
-            self.last_args = [action, boolean_folder]
-        elif self.last_args:
-            action, boolean_folder = self.last_args
+        self.action = action
+        self.boolean_folder = boolean_folder
 
-        self.explorer = {'c':ExplorerCreate,
-                         'd':ExplorerDelete,
-                         'e':ExplorerEdit,
-                         'r':ExplorerRead}[action](self, boolean_folder)
+        self.header = {'r': "Explorer Read",
+                       'e': "Explorer Edit",
+                       'd': "Explorer Delete"}[action]
 
-    def call_back(self):
-        self.explorer.call_back()
+        self.dir = UOS.User.rootpath()
+        self.start_dir = self.dir
+        if UOS.User.has_privilege():
+            self.stop_dir = UOS.Drive.Path.DRIVE
+        else:
+            self.stop_dir = self.start_dir
 
-    def call_selection(self):
-        self.explorer.call_selection()
+        self.create_menu()

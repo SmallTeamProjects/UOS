@@ -36,9 +36,14 @@ class Commands:
             return True
         return False
 
+    # entry point
     @classmethod
-    def call(cls, parent, text):
-        cls.link.action = parent.parent.state
+    def call(cls, parent, text, single=False):
+        if single:
+            cls.link.action = parent.state
+        else:
+            cls.link.action = parent.parent.state
+
         cls.link.parent = parent
         cls.link.writer = parent.writer
         if cls.link.state:

@@ -18,6 +18,32 @@ class UOS_User:
     has_any = False
     has_admin = False
 
+    # All default menu except Main will be consider hardcoded.
+    @staticmethod
+    def default_menu():
+        return {
+            "MainMenu": [
+                ["SubMenu", "Documents", "Documents"],
+                ["SubMenu" ,"Settings", "Settings"],
+                ["Command", "Logout", "LOGOFF"],
+                ["Command", "Shutdown", "SET HALT"]
+            ],
+            "Documents": [
+                ["Command", "Create", "CREATE FILE"],
+                ["Explorer", "> Read", "r"],
+                ["Explorer", "> Edit", "e"],
+                ["Explorer", "> Delete", "d"],
+            ],
+            "Settings": [
+                ["SubMenu", "> Terminal Color", "TerminalColor"]
+            ],
+            "TerminalColor": [
+                ["Command", "Green", "SET COLOR green"],
+                ["Command", "Amber", "SET COLOR amber"],
+                ["Command", "Blue", "SET COLOR blue"]
+            ]
+        }
+
     @classmethod
     def get_current(cls):
         return cls.current
@@ -61,7 +87,8 @@ class UOS_User:
             password = password,
             root = root,
             group = group,
-            color = 'green')
+            color = 'green',
+            menu = cls.default_menu())
         path = os.path.join(UOS_Path.DATABASE, root)
         os.makedirs(path)
         cls.save()

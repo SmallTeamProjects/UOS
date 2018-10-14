@@ -407,4 +407,4 @@ class UserCommands(BaseCommand):
                           "HELP or ?"])
 
     def command_menu(self):
-        self.link.action.flip('Menu')
+        self.link.action.flip('MenuMenu')
