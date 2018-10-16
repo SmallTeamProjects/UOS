@@ -1,53 +1,45 @@
 import os
 import pygame
-from .menu import Menu
+from .menu import Menu, MenuBase
 from ..uos import UOS
 
-class ExplorerFile:
+class ExplorerFile(MenuBase):
     def __init__(self, parent, name):
-        self.name = '[ {} ]'.format(name)
-        self.parent = parent
+        MenuBase.__init__(self, parent, 0, name)
 
-    def __call__(self):
-        pass
-
-class ExplorerDir:
+class ExplorerDir(MenuBase):
     def __init__(self, parent, name):
-        self.name = '[ > {} ]'.format(name)
-        self.parent = parent
+        MenuBase.__init__(self, parent, 0, name)
         self.item = name
 
-    def __call__(self):
+    def call_right(self):
         self.parent.dir_change(self.item)
 
-class ExplorerDirUp:
+class ExplorerDirUp(MenuBase):
     def __init__(self, parent):
-        self.name = '[ .. ]'
-        self.parent = parent
+        MenuBase.__init__(self, parent, 0, '..')
 
-    def __call__(self):
+    def call_right(self):
         self.parent.dir_up()
 
-class ExplorerBack:
+class ExplorerBack(MenuBase):
     def __init__(self, parent):
-        self.name = '[ < Back ]'
-        self.parent = parent
+        MenuBase.__init__(self, parent, 0, '< Back')
 
-    def __call__(self):
+    def call_right(self):
         self.parent.state.flip_back()
 
-class ExplorerExit:
+class ExplorerExit(MenuBase):
     def __init__(self, parent):
-        self.name = '[ < Exit ]'
-        self.parent = parent
+        MenuBase.__init__(self, parent, 0, '< Exit')
 
-    def __call__(self):
+    def call_right(self):
         self.parent.state.flip('Terminal')
 
 
 class Explorer(Menu):
     def __init__(self):
-        Menu.__init__(self, 'Explorer', 'Explorer')
+        Menu.__init__(self, None, 'Explorer', 'Explorer')
         self.boolean_folder = False
         self.action = None
         self.strings = []

@@ -4,7 +4,7 @@ from .admin import AdminCommands
 from .user import UserCommands
 from ..uos import UOS
 
-class Commands:
+class Command:
     link = SimpleNamespace(state = None, interval = -1)
     group_user = ['admin', 'user', 'maintainence']
     group_admin = ['admin', 'maintainence']
@@ -52,7 +52,7 @@ class Commands:
             if not cls.cat_command(text, cls.group_admin, cls.admin):
                 if not cls.cat_command(text, cls.group_user, cls.user):
                     if not cls.default_command(text):
-                        self.link.writer.add('ERROR_INVALID_FUNCTION', 30)
+                        cls.link.writer.add('ERROR_INVALID_FUNCTION', 30)
 
     @staticmethod
     def call_args(key, text):

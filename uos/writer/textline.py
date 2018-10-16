@@ -3,7 +3,7 @@ from types import SimpleNamespace
 from .text import WriterText
 from .carrot import Carrot
 from .inputline import InputLine
-from ..commands import Commands
+from ..commands import Command
 from ..uos import UOS
 
 
@@ -11,7 +11,7 @@ class TextLine(InputLine):
     def __init__(self, parent, writer, carrot):
         InputLine.__init__(self, parent, Carrot(carrot))
         self.writer = writer
-        Commands.init()
+        Command.init()
         self.recall = SimpleNamespace(pos = -1, buffer = [])
         self.clear_buffer()
 
@@ -72,7 +72,7 @@ class TextLine(InputLine):
         self.writer.append(self.text)
         self.new_text()
         self.clear_buffer()
-        Commands.call(self, text)
+        Command.call(self, text)
 
     def keydown_up(self):
         UOS.sounds.play('typing')

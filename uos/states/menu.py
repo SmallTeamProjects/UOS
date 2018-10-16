@@ -1,42 +1,98 @@
 import pygame
+from types import SimpleNamespace
 from ..uos import UOS
 from ..writer import Writer
-from ..commands import Commands
+from ..commands import Command
 
-class SubMenu:
-    def __init__(self, parent, name, goto_menu):
-        self.name = '[ {} ]'.format(name)
-        self.goto_menu = goto_menu
+class MenuBase:
+    def __init__(self, parent, position=0, name=None):
         self.parent = parent
+        self.position = position
+        if name:
+            self.name = '[ {} ]'.format(name)
 
-    def __call__(self):
-        self.parent.state.flip(self.goto_menu)
+    def call_right(self):
+        pass
 
-class MenuCommand:
-    def __init__(self, parent, name, command):
-        self.name = '[ {} ]'.format(name)
-        self.command = command
-        self.parent = parent
+    def call_left(self):
+        pass
 
-    def __call__(self):
-        Commands.call(self.parent, self.command, True)
+class MenuBack(MenuBase):
+    def __init__(self, parent, position):
+        MenuBase.__init__(self, parent, position, "Back")
 
-class MenuExplorer:
-    def __init__(self, parent, name, arg):
-        self.name = '[ {} ]'.format(name)
-        self.parent = parent
+    def call_right(self):
+        self.parent.state.flip_back()
+
+class MenuExplorer(MenuBase):
+    def __init__(self, parent, position, name, arg):
+        MenuBase.__init__(self, parent, position, name)
         self.arg = arg
 
-    def __call__(self):
+    def call_right(self):
         self.parent.state.flip('Explorer', self.arg)
 
-class MenuBack:
-    def __init__(self, parent):
-        self.name = '[ Back ]'
+class MenuNested:
+    def __init__(self, parent, position, name, nested_menu):
+        self.nested_menu = nested_menu
+        self.position = position
+        self.basename = name
         self.parent = parent
+        self.menu_pos = {'green': 0, 'amber': 1, 'blue': 2}[UOS.Variables.color_key]
+        self.name = self.get_name()
 
-    def __call__(self):
-        self.parent.state.flip_back()
+    def get_item(self):
+        return self.parent.menu[self.nested_menu][self.menu_pos]
+
+    def get_name(self):
+        return "{:<20} < {} > ".format(self.basename, self.get_item()[1])
+
+    def call_right(self):
+        self.menu_pos += 1
+        self.menu_pos %= len(self.parent.menu[self.nested_menu])
+        self.call_command()
+
+    def call_left(self):
+        self.menu_pos -= 1
+        self.menu_pos %= len(self.parent.menu[self.nested_menu])
+        self.call_command()
+
+    def call_command(self):
+        self.name = self.get_name()
+        self.parent.writer.get_line(1, self.position).set_text(self.name)
+        Command.call(self.parent, self.get_item()[2], True)
+
+class MenuSelection(MenuBase):
+    def __init__(self, parent, position, name, command):
+        MenuBase.__init__(self, parent, position, name)
+        self.command = command
+
+    def call_right(self):
+        pass
+        #Command.call(self.parent, self.command, True)
+
+class MenuText(MenuBase):
+    def __init__(self, parent, position, name, command):
+        MenuBase.__init__(self, parent, position, None)
+        # Give command a fake writer
+        self.writer = SimpleNamespace(add=self.add, clear=self.clear)
+        self.command = command
+        Command.call(self, command)
+        self.name = "  {:<20}   {}".format(name, self.text)
+
+    def add(self, text, *args, **kwargs):
+        self.text = text
+
+    def clear(self):
+        pass
+
+class SubMenu(MenuBase):
+    def __init__(self, parent, position, name, goto_menu):
+        MenuBase.__init__(self, parent, position, name)
+        self.goto_menu = goto_menu
+
+    def call_right(self):
+        self.parent.state.flip(self.goto_menu)
 
 class MenuMenu(UOS.State):
     user_name = None
@@ -47,20 +103,22 @@ class MenuMenu(UOS.State):
         cls.user_name = UOS.User.name
         menu = vars(UOS.User.current).get('menu', UOS.User.default_menu())
         for key, items in menu.items():
-            menu = Menu(key, key)
-            menu.strings = []
-            for item in items:
+            new_menu = Menu(menu, key, key)
+            new_menu.strings = []
+            for enum, item in enumerate(items):
                 if item[0] == 'SubMenu':
-                    menu.strings.append(SubMenu(menu, *item[1:]))
+                    new_menu.strings.append(SubMenu(new_menu, enum, *item[1:]))
+                elif item[0] == 'Nested':
+                    new_menu.strings.append(MenuNested(new_menu, enum, *item[1:]))
                 elif item[0] == 'Command':
-                    menu.strings.append(MenuCommand(menu, *item[1:]))
+                    new_menu.strings.append(MenuSelection(new_menu, enum, *item[1:]))
                 elif item[0] == 'Explorer':
-                    menu.strings.append(MenuExplorer(menu, *item[1:]))
+                    new_menu.strings.append(MenuExplorer(new_menu, enum, *item[1:]))
                 else:
                     print("Unknown menu command:", item)
 
-            menu.strings.append(MenuBack(menu))
-            menu.display_string()
+            new_menu.strings.append(MenuBack(new_menu, enum))
+            new_menu.display_string()
 
     def __init__(self):
         UOS.State.__init__(self)
@@ -78,8 +136,9 @@ class MenuMenu(UOS.State):
             self.state.flip('MainMenu')
 
 class Menu(UOS.State):
-    def __init__(self, menu_name, header, padding=0):
+    def __init__(self, menu, menu_name, header, padding=0):
         UOS.State.__init__(self, menu_name)
+        self.menu = menu
         self.linesize = UOS.text.get_linesize(padding)
         size = self.state.machine.rect.size
         y = 8 + self.linesize * 2
@@ -134,11 +193,11 @@ class Menu(UOS.State):
 
                 elif event.key == pygame.K_LEFT:
                     UOS.sounds.play('enter')
-                    self.state.flip_back()
+                    self.strings[self.select].call_left()
 
                 elif event.key in [pygame.K_RETURN, pygame.K_RIGHT]:
                     UOS.sounds.play('enter')
-                    self.strings[self.select]()
+                    self.strings[self.select].call_right()
 
     def render(self, surface):
         surface.fill((0,0,0))

@@ -35,7 +35,7 @@ class UOS_User:
                 ["Explorer", "> Delete", "d"],
             ],
             "Settings": [
-                ["SubMenu", "> Terminal Color", "TerminalColor"]
+                ["Nested", "Terminal Color", "TerminalColor"]
             ],
             "TerminalColor": [
                 ["Command", "Green", "SET COLOR green"],
