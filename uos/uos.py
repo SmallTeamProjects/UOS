@@ -1,20 +1,17 @@
 import os
 import pygame
 from .system import *
-
+from .system.timer import TickTimerData
 
 class UOS:
-    UOS_User.variable_setup()
-
-    Drive = UOS_Drive
     State = UOS_State
-    User = UOS_User
-    Data = UOS_Data
-    Variables = UOS_Variables
+    color = UOS_Color()
+    interval = 30
+    idle = False
 
     @classmethod
     def get_interval(cls):
-        return cls.Variables.interval
+        return cls.interval
 
     @classmethod
     def run(cls, state):
@@ -22,10 +19,18 @@ class UOS:
 
     @classmethod
     def setup(cls):
-        UOS_StateMachine.screen_center()
-        UOS_StateMachine.create('UOS', 512, 384)
-        pygame.key.set_repeat(80,80)
+        TickTimerData.setup(cls.get_interval)
+        cls.bus = EventBus(cls)
+        cls.data = UOS_Data()
+        cls.drive = UOS_Drive(cls.bus)
+        cls.path = cls.drive.path
         cls.sounds = UOS_Sounds()
-        cls.Drive.setup()
-        cls.User.load()
-        cls.text = UOS_Text()
+        cls.user = UOS_User(cls.bus)
+        cls.text = UOS_Text(cls.color)
+
+        UOS_StateMachine.screen_center()
+        machine = UOS_StateMachine('UOS', cls.bus, 512, 384)
+        cls.color.instances = machine.instances
+        pygame.key.set_repeat(80,80)
+        cls.drive.setup()
+        cls.user.load()

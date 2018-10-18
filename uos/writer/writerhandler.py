@@ -1,6 +1,5 @@
 from types import SimpleNamespace
 from .text import WriterText
-from ..uos import UOS
 
 
 # WriterHandler handles the typewriting effect. It store all the

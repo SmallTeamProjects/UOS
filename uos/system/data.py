@@ -1,5 +1,3 @@
-from .variables import UOS_Variables
-
 class Data:
     def __init__(self, text,
                  interval = -1,

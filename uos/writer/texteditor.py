@@ -15,20 +15,22 @@ class TextEditor:
                                        line=0,
                                        pos=0)
 
-        self.linesize = UOS.text.font.get_linesize() + padding
+        self.linesize = UOS.text.get_linesize(padding)
         self.max_lines = int(rect.h / self.linesize) - 1
         self.editor_line = TextEditorLine(self)
 
-    def entrance(self, filename):
+    def entrance(self, filename, create=False):
         self.display.buffer = [WriterText("", sound_keys=None, state=[WriterText.State.append])]
         self.editor_line.text = self.display.buffer[0]
         self.display.filename = filename
         self.display.line = 0
         self.display.pos = 0
         self.editor_line.carrot_update()
+        if create:
+            self.editor_line.clear_buffer()
 
     def load(self, filename):
-        self.entrance(filename)
+        self.entrance(filename, True)
         keys = {'sound_keys':None, 'state':[WriterText.State.append]}
         with open(filename, 'r') as read_file:
             self.display.buffer = [WriterText(line.rstrip(), **keys) for line in read_file]

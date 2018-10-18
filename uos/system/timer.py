@@ -1,7 +1,10 @@
 import pygame
-from .variables import UOS_Variables
 
 class TickTimerData:
+    @classmethod
+    def setup(cls, get_interval):
+        cls.get_interval = get_interval
+
     def __init__(self, parent, interval, callback , pydata):
         self.parent = parent
         self.next_tick = parent.ticks + interval
@@ -32,7 +35,7 @@ class TickTimerData:
             if self.interval != 0:
                 while self.parent.ticks > self.next_tick:
                     if self.interval < 0:
-                        self.next_tick += UOS_Variables.interval
+                        self.next_tick += self.get_interval()
                     else:
                         self.next_tick += self.interval
                     self.count += 1

@@ -72,7 +72,7 @@ class MinigameBase(UOS.State):
             for pline, p in zip(position['line'], position['pos']):
                 text = self.display_buffer[pline][p[0]:p[1]]
                 pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline % 16) + y
-                self.highlight_images.append((UOS.text(text, (0,0,0), UOS.text.get_color()), pos))
+                self.highlight_images.append((UOS.text(text, (0,0,0), UOS.color.color), pos))
         else:
             self.highlight_images = None
 
@@ -374,7 +374,7 @@ class MinigameBase(UOS.State):
                     surface.blit(image, pos)
 
     def render_text(self, text):
-        return UOS.text(text, (0,0,0), UOS.text.get_color())
+        return UOS.text(text, (0,0,0), UOS.color.color)
 
     # sets attempts back to 4
     def reset_tries(self):

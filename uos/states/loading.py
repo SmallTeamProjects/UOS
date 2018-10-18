@@ -8,7 +8,7 @@ class Loading(UOS.State):
         self.writer = Writer(self.state)
         self.writer.add_output(self.state.machine.rect.inflate(-16, -16))
         self.time_next = 800
-        for item in UOS.Data.loading:
+        for item in UOS.data.loading:
             self.writer.add(0, item.text, item.interval,
                             item.sound, item.newline,
                             insert_after=item.insert_after,
@@ -21,8 +21,6 @@ class Loading(UOS.State):
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 self.state.flip('Terminal')
-            else:
-                self.writer.event_keydown(event)
 
     def render(self, surface):
         surface.fill((0,0,0))

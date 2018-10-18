@@ -1,61 +1,56 @@
 import os
 import shutil
 import pickle
-from .path import UOS_Path
+from .path import UOS_Path, UOS_DrivePath
 
 class UOS_Drive:
-    Path = UOS_Path
+    def __init__(self, bus):
+        self.Path = UOS_Path
+        self.path = UOS_DrivePath()
+        UOS_Path.setup(bus, self.path)
 
-    @staticmethod
-    def deserialize_data(filename):
+    def deserialize_data(self, filename):
         with open(filename, "rb") as serialize_in:
             deserialized_output = pickle.load(serialize_in)
 
         return deserialized_output
 
-    @classmethod
-    def detect(cls):
+    def detect(self):
         return {
-            'drive': os.path.exists(cls.Path.DRIVE),
-            'systems':os.path.exists(cls.Path.SYSTEMS),
-            'settings':os.path.exists(cls.Path.SETTINGS),
-            'accounts':os.path.exists(cls.Path.ACCOUNTS),
-            'database':os.path.exists(cls.Path.DATABASE),
-            'logs':os.path.exists(cls.Path.LOGS)
+            'drive': os.path.exists(self.path.drive),
+            'systems':os.path.exists(self.path.systems),
+            'settings':os.path.exists(self.path.settings),
+            'accounts':os.path.exists(self.path.accounts),
+            'database':os.path.exists(self.path.database),
+            'logs':os.path.exists(self.path.logs)
         }
 
-    @classmethod
-    def mount(cls, name, path):
-        if cls.Path.exists(path):
-            cls.Path.mounted[name] = path
+    def mount(self, name, path):
+        if self.Path(path).exists():
+            self.path.mounted[name] = path
             return True
         return False
 
-    @staticmethod
-    def move_dir(source, dest):
+    def move_dir(self, source, dest):
         if isinstance(source, UOS_Path) and isinstance(dest, UOS_Path):
             shutil.move(source.path, dest.path)
 
-    @staticmethod
-    def move_file(source, dest):
+    def move_file(self, source, dest):
         if isinstance(source, UOS_Path) and isinstance(dest, UOS_Path):
             shutil.move(source.path, dest.path)
 
-    @staticmethod
-    def rename(source, dest):
+    def rename(self, source, dest):
         if isinstance(source, UOS_Path) and isinstance(dest, UOS_Path):
             os.rename(source.path, dest.path)
 
-    @staticmethod
-    def serialize_data(target, filename):
+    def serialize_data(self, target, filename):
         with open(filename, "wb") as serialize_out:
             pickle.dump(target, serialize_out)
 
-    @classmethod
-    def setup(cls):
-        info = cls.detect()
+    def setup(self):
+        info = self.detect()
         if not info['drive']:
-            os.mkdir(cls.Path.DRIVE)
+            os.mkdir(self.path.drive)
 
         if not info['systems']:
-            os.mkdir(cls.Path.SYSTEMS)
+            os.mkdir(self.path.systems)

@@ -1,6 +1,5 @@
 import os
 from types import SimpleNamespace
-from ..uos import UOS
 
 class BaseCommand:
     def __init__(self, link):

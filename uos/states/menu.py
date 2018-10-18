@@ -38,7 +38,7 @@ class MenuNested:
         self.position = position
         self.basename = name
         self.parent = parent
-        self.menu_pos = {'green': 0, 'amber': 1, 'blue': 2}[UOS.Variables.color_key]
+        self.menu_pos = {'green': 0, 'amber': 1, 'blue': 2}[UOS.color.key]
         self.name = self.get_name()
 
     def get_item(self):
@@ -100,8 +100,8 @@ class MenuMenu(UOS.State):
     # setup: Will make new states over the old ones
     @classmethod
     def setup(cls):
-        cls.user_name = UOS.User.name
-        menu = vars(UOS.User.current).get('menu', UOS.User.default_menu())
+        cls.user_name = UOS.user.name
+        menu = vars(UOS.user.current).get('menu', UOS.user.default_menu())
         for key, items in menu.items():
             new_menu = Menu(menu, key, key)
             new_menu.strings = []
@@ -126,7 +126,7 @@ class MenuMenu(UOS.State):
 
     def entrance(self, regain_focus):
         self.regain_focus = regain_focus
-        if self.user_name != UOS.User.name:
+        if self.user_name != UOS.user.name:
             MenuMenu.setup()
 
     def update(self, ticks, delta):
@@ -208,4 +208,4 @@ class Menu(UOS.State):
             surface.blit(self.selection[self.select], position)
 
     def render_text(self, text):
-        return UOS.text(text, (0,0,0), UOS.text.get_color())
+        return UOS.text(text, (0,0,0), UOS.color.color)

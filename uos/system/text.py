@@ -1,9 +1,9 @@
 import os
 import pygame
-from .variables import UOS_Variables
 
 class UOS_Text:
-    def __init__(self):
+    def __init__(self, color):
+        self.link = color
         path = os.path.join('resources', 'fixedsys.ttf')
         self.font = pygame.font.Font(path, 16)
         #self.alpha = 0.7
@@ -14,9 +14,9 @@ class UOS_Text:
         elif foreground:
             image = self.font.render(text, 1, foreground)
         elif background:
-            image = self.font.render(text, 1, UOS_Variables.color, background)
+            image = self.font.render(text, 1, self.link.color, background)
         else:
-            image = self.font.render(text, 1, UOS_Variables.color)
+            image = self.font.render(text, 1, self.link.color)
 
         # requires NumPy
         #image = image.convert_alpha()
@@ -31,12 +31,6 @@ class UOS_Text:
 
 
         return image
-
-    def get_color(self):
-        return UOS_Variables.color
-
-    def get_colors(self):
-        return list(UOS_Variables.COLORS.keys())
 
     def get_linesize(self, padding=0):
         return self.font.get_linesize() + padding

@@ -27,7 +27,7 @@ class AdminCommands(BaseCommand):
 
     def command_create_user_password(self, password):
         if len(password) > 3:
-            UOS.User.create(self.info.name, password, self.info.group)
+            UOS.user.create(self.info.name, password, self.info.group)
             self.writer_add('User {0} has been added'.format(self.info.name))
             self.info.name = None
             self.info.group = None
@@ -38,8 +38,8 @@ class AdminCommands(BaseCommand):
             self.writer_add('Enter {0} password.'.format(self.info.name), protect=True)
 
     def command_delete_user(self, username):
-        if UOS.User.current.group == 'admin':
-            if UOS.User.remove(username):
+        if UOS.user.current.group == 'admin':
+            if UOS.user.remove(username):
                 self.writer_add('{0} has been removed'.format(username))
             else:
                 self.writer_add("{0} doesn't exists".format(username))
@@ -57,12 +57,12 @@ class AdminCommands(BaseCommand):
         print('set default directory')
 
     def command_show_users(self):
-        if len(UOS.User.accounts) > 0:
+        if len(UOS.user.accounts) > 0:
             self.writer_clear()
-            keys = list(UOS.User.accounts.keys())
+            keys = list(UOS.user.accounts.keys())
             keys.sort()
             for key in keys:
-                item = UOS.User.accounts[key]
+                item = UOS.user.accounts[key]
                 self.writer_add('{0} : {1}, {2}'.format(key, item.group, item.root))
         else:
             self.writer_add("System has no users".format(filename))

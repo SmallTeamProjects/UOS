@@ -1,16 +1,22 @@
 import os
-from .variables import UOS_Variables
+
+class UOS_DrivePath:
+    def __init__(self):
+        self.drive = "UOS_DRIVE"
+        self.database = os.path.join(self.drive, 'DATABASE')
+        self.systems = os.path.join(self.drive, 'systems')
+        self.settings = os.path.join(self.systems, 'settings.f')
+        self.accounts = os.path.join(self.systems, 'accounts.f')
+        self.logs = os.path.join(self.systems, 'logs.f')
+
+        self.current = self.drive
+        self.mounted = {}
 
 class UOS_Path:
-    DRIVE = 'UOS_DRIVE'
-    DATABASE = os.path.join(DRIVE, 'DATABASE')
-    SYSTEMS = os.path.join(DRIVE, 'systems')
-    SETTINGS = os.path.join(SYSTEMS, 'settings.f')
-    ACCOUNTS = os.path.join(SYSTEMS, 'accounts.f')
-    LOGS = os.path.join(SYSTEMS, 'logs.f')
-
-    current = DRIVE
-    mounted = {}
+    @classmethod
+    def setup(cls, bus, drive_path):
+        cls.bus = bus
+        cls.drive_path = drive_path
 
     def __init__(self, source=None, location=None):
         if isinstance(source, (tuple, list)):
@@ -22,7 +28,7 @@ class UOS_Path:
         if source:
             self.path = self.uos_join(source)
         else:
-            self.path = UOS_Path.current
+            self.path = UOS_Path.drive_path.current
 
     def basename(self):
         return os.path.basename(self.path)
@@ -30,13 +36,13 @@ class UOS_Path:
     def change_dir(self, *dirs):
         old_path = self.path
         self.path = os.path.normpath(os.path.join(self.path, *dirs))
-        if self.path.startswith(UOS_Variables.user_rootpath()):
+        if self.path.startswith(UOS_Path.bus.fetch('root path')):
             return True
-        elif UOS_Variables.user_has_privilege():
-            if self.path.startswith(UOS_Path.DRIVE):
+        elif UOS_Path.bus.fetch("user has privilege"):
+            if self.path.startswith(UOS_Path.drive_path.drive):
                 return True
 
-        for holotape in UOS_Path.mounted:
+        for holotape in UOS_Path.drive_path.mounted:
             if self.path.startswith(holotape):
                 return True
 
@@ -69,15 +75,16 @@ class UOS_Path:
 
     def uos_join(self, path):
         path_split = self.uos_split(path)
-        privilege = UOS_Variables.user_has_privilege()
+        privilege = UOS_Path.bus.fetch("user has privilege")
         if privilege and path_split[0] == 'uos':
-            return os.path.join(UOS_Path.DRIVE, path[3:])
+            return os.path.join(UOS_Path.drive_path.drive, path[3:])
 
-        for key in UOS_Path.mounted.keys():
+        for key in UOS_Path.drive_path.mounted.keys():
             if path_split[0] == key:
-                return os.path.join(UOS_Path.mounted[key], path[len(key):])
+                return os.path.join(UOS_Path.drive_path.mounted[key],
+                                    path[len(key):])
 
-        return os.path.join(UOS_Path.current, path)
+        return os.path.join(UOS_Path.drive_path.current, path)
 
     def uos_split(self, path):
         allparts = []

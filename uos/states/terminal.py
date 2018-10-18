@@ -6,7 +6,7 @@ class Terminal(UOS.State):
     def __init__(self):
         UOS.State.__init__(self)
         self.writer = Writer(self.state)
-        if UOS.User.has_admin:
+        if UOS.user.has_admin:
             x = 10
             y = 10
             w = self.state.machine.rect.w - x * 2
@@ -17,8 +17,8 @@ class Terminal(UOS.State):
             self.writer.add_input(rect)
             self.writer.add(0, 'Welcome to ROBCO Industries (TM) Termlink')
         else:
-            for item in UOS.Data.intro:
-                self.writer.add_input(UOS.Screen.rect.inflate(-20, -20))
+            for item in UOS.data.intro:
+                self.writer.add_input(self.state.machine.rect.inflate(-20, -20))
                 self.writer.add(0, item.text, item.interval,
                                 item.sound, newline=item.newline,
                                 insert_after=item.insert_after,

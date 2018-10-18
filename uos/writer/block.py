@@ -1,5 +1,4 @@
 import pygame
-from ..uos import UOS
 from .carrot import Carrot
 from .text import WriterText
 from .textline import TextLine

@@ -16,8 +16,10 @@ class Editor(UOS.State):
         if filename:
             if load:
                 self.editor.load(filename)
-            else:
+            elif regain_focus:
                 self.editor.entrance(filename)
+            else:
+                self.editor.entrance(filename, True)
 
     def event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -33,7 +35,7 @@ class SavingEditor(UOS.State):
         self.saving_timer = self.state.timer(300, self.call_saving)
         self.symbols = '/-\|'
 
-    def entrance(self, filename):
+    def entrance(self, regain_focus, filename):
         self.filename = filename
         self.saving_finish = 0
         self.pos = -1

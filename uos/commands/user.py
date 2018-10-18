@@ -59,7 +59,7 @@ class UserCommands(BaseCommand):
         BaseCommand.__init__(self, link)
 
     def command_create_dir(self, dirname, location=None):
-        newdir = UOS.Drive.Path(dirname, location)
+        newdir = UOS.drive.Path(dirname, location)
         if newdir.isdir():
             self.writer_add('Directory already exists')
         else:
@@ -67,7 +67,7 @@ class UserCommands(BaseCommand):
             self.writer_add("{0} directory was created".format(dirname))
 
     def command_create_file(self, filename, filetype, location=None):
-        filepath = UOS.Drive.Path((filename, filetype), location)
+        filepath = UOS.drive.Path((filename, filetype), location)
         if filepath.exists():
             line = "{0} file already exits.".format(filename)
             self.writer_add(line)
@@ -90,10 +90,10 @@ class UserCommands(BaseCommand):
                "CREATE ?"])
 
     def command_change_dir(self, *dirs):
-        source = UOS.Drive.Path()
+        source = UOS.drive.Path()
         if source.change_dir(*dirs):
             if source.isdir():
-                UOS.Drive.Path.current = source.path
+                UOS.drive.path.current = source.path
                 self.writer_add('Dir has been change')
             else:
                 self.writer_add('Is not a directory')
@@ -101,7 +101,7 @@ class UserCommands(BaseCommand):
             self.writer_add('Does not exists')
 
     def command_delete_dir(self, dirname, location=None):
-        dirpath = UOS.Drive.Path(dirname, location)
+        dirpath = UOS.drive.Path(dirname, location)
         if dirpath.isdir():
             dirpath.rmdir()
             self.writer_add('{0} directory has been delete'.format(dirname))
@@ -109,7 +109,7 @@ class UserCommands(BaseCommand):
             self.writer_add('{0} directory does not exists'.format(dirname))
 
     def command_delete_file(self, filename, filetype, location=None):
-        filepath = UOS.Drive.Path((filename, filetype), location)
+        filepath = UOS.drive.Path((filename, filetype), location)
         if filepath.isfile():
             filepath.remove()
             self.writer_add('{0} has been removed'.format(filename))
@@ -132,7 +132,7 @@ class UserCommands(BaseCommand):
                      "DELETE ?"] )
 
     def command_edit_file(self, filename, filetype, location=None):
-        filepath = UOS.Drive.Path((filename, filetype), location)
+        filepath = UOS.drive.Path((filename, filetype), location)
         if filepath.isfile():
             self.link.action.flip('Editor', filepath.path, True)
         else:
@@ -155,7 +155,7 @@ class UserCommands(BaseCommand):
         self.writer_add( ["...Checking Clearance..........",
                           "...AUTHORIZED.................",
                           "...Locking Mechanism Enable..."] )
-        UOS.User.set(None)
+        UOS.user.set(None)
 
     def command_logoff_help(self):
         self.writer_clear()
@@ -171,7 +171,7 @@ class UserCommands(BaseCommand):
         print('look for external storage')
 
     def command_move_dir(self, source):
-        filepath = UOS.Drive.Path(source)
+        filepath = UOS.drive.Path(source)
         if filepath.isdir():
             self.info.filepath = filepath
             self.link.state = self.command_move_dir_new
@@ -181,15 +181,15 @@ class UserCommands(BaseCommand):
 
     def command_move_dir_new(self, dest):
         self.link.state = None
-        destpath = UOS.Drive.Path(self.info.filepath.basename(), dest)
+        destpath = UOS.drive.Path(self.info.filepath.basename(), dest)
         if destpath.exists():
             self.writer_add("Directory already exists")
         else:
-            UOS.Drive.move_dir(self.info.filepath, destpath)
+            UOS.drive.move_dir(self.info.filepath, destpath)
             self.writer_add('Directory has been moved')
 
     def command_move_file(self, filename, filetype, location=None):
-        filepath = UOS.Drive.Path((filename, filetype), location)
+        filepath = UOS.drive.Path((filename, filetype), location)
         if filepath.isfile():
             self.info.filepath = filepath
             self.link.state = self.command_move_file_new
@@ -199,15 +199,15 @@ class UserCommands(BaseCommand):
 
     def command_move_file_new(self, dest):
         self.link.state = None
-        filepath = UOS.Drive.Path(self.info.filepath.basename(), dest)
+        filepath = UOS.drive.Path(self.info.filepath.basename(), dest)
         if filepath.exists():
             self.writer_add("File already exists")
         else:
-            UOS.Drive.move_file(self.info.filepath, dest)
+            UOS.drive.move_file(self.info.filepath, dest)
             self.writer_add('File has been moved')
 
     def command_rename_dir(self, dirname, location=None):
-        dirpath = UOS.Drive.Path(dirname, location)
+        dirpath = UOS.drive.Path(dirname, location)
         if dirpath.isdir():
             self.link.state = self.command_rename_dir_new
             self.info.filepath = dirpath
@@ -217,9 +217,9 @@ class UserCommands(BaseCommand):
 
     def command_rename_dir_new(self, dirname, location=None):
         self.link.state = None
-        dirpath = UOS.Drive.Path(dirname, location)
+        dirpath = UOS.drive.Path(dirname, location)
         if not dirpath.exists():
-            UOS.Drive.rename(self.info.filepath, dirpath)
+            UOS.drive.rename(self.info.filepath, dirpath)
             self.writer_add('Directory has been rename')
         else:
             self.writer_add("Directory already exists")
@@ -227,7 +227,7 @@ class UserCommands(BaseCommand):
     def command_rename_file(self, filename, filetype, location=None):
         self.info.data = filetype
         self.info.name = location
-        filepath = UOS.Drive.Path((filename, filetype), location)
+        filepath = UOS.drive.Path((filename, filetype), location)
         if filepath.isfile():
             self.writer_add("Enter new filename for " + filename)
             self.info.filepath = filepath
@@ -237,16 +237,16 @@ class UserCommands(BaseCommand):
 
     def command_rename_file_new(self, filename, force=False):
         self.link.state = None
-        filepath = UOS.Drive.Path((filename, self.info.data), self.info.name)
+        filepath = UOS.drive.Path((filename, self.info.data), self.info.name)
         if filepath.exists() and not force:
             self.writer_add("{0} already exists".format(filename))
         else:
-            UOS.Drive.rename(self.info.filepath, filepath)
+            UOS.drive.rename(self.info.filepath, filepath)
             self.writer_add('{0} has been rename to {1}'.format(self.info.name, filename))
 
     def command_rename_user(self, username, newname):
-        if UOS.User.name == username or UOS.Drive.current.group == 'admin':
-            value = UOS.User.rename(username, newname)
+        if UOS.user.name == username or UOS.drive.current.group == 'admin':
+            value = UOS.user.rename(username, newname)
             if value == 1:
                 self.writer_add('{0} has been rename to {1}'.format(username, newname))
             elif value == 2:
@@ -270,7 +270,7 @@ class UserCommands(BaseCommand):
                      "RENAME ?"])
 
     def command_run_file(self, filename, filetype, location=None):
-        program = UOS.Drive.Path((filename, filetype), location)
+        program = UOS.drive.Path((filename, filetype), location)
         if program.exists():
             FILETYPES = {'py':'python'}
             if filetype in FILETYPES.keys():
@@ -306,11 +306,11 @@ class UserCommands(BaseCommand):
         print('file can only be opened by entering a password')
 
     def command_set_halt(self, name):
-        UOS.User.set(None)
+        UOS.user.set(None)
         print('shutdown', name)
 
     def command_set_halt_restart(self):
-        UOS.User.set(None)
+        UOS.user.set(None)
         self.link.action.flip('Loading')
 
     def command_set_halt_restart_maintainence(self):
@@ -322,15 +322,15 @@ class UserCommands(BaseCommand):
 
     def command_set_interval(self, interval):
         if interval.isdigit():
-            UOS.Variables.interval = int(interval)
+            UOS.interval = int(interval)
         else:
             self.writer_add("Intervals must be a number")
 
     def command_set_color(self, color):
-        if color in UOS.text.get_colors():
-            UOS.User.current.color = color
-            UOS.User.save()
-            UOS.State.set_color(color)
+        if color in UOS.color.COLORS:
+            UOS.user.current.color = color
+            UOS.user.save()
+            UOS.color.change_color(color)
         else:
             self.writer_add("Invalid color")
 
@@ -364,7 +364,7 @@ class UserCommands(BaseCommand):
                      "SET ?"])
 
     def command_show_default(self):
-        self.writer_add('current directory: ' + UOS.Drive.Path.current)
+        self.writer_add('current directory: ' + UOS.drive.path.current)
 
     def command_show_device(self):
         print('return basic system info')

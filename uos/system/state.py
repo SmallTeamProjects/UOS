@@ -1,5 +1,4 @@
 from .timer import UOS_TickTimer
-from .variables import UOS_Variables
 
 class UOS_StateMethods:
     machine = None
@@ -10,10 +9,10 @@ class UOS_StateMethods:
         self.previous_state = None
 
     def flip(self, classname, *args, **kwargs):
-        self.machine.next_state = classname, args, kwargs
+        self.machine.bus.register_event('next state', classname, *args, **kwargs)
 
     def flip_back(self, *args, **kwargs):
-        self.machine.next_state = self.previous_state, args, kwargs
+        self.machine.bus.register_event('next state', self.previous_state, *args, **kwargs)
 
     def screen_entrance(self, regain_focus, previous_state, *args, **kwargs):
         if previous_state:
@@ -33,18 +32,6 @@ class UOS_StateMethods:
         self.parent.event(event)
 
 class UOS_State:
-    on_color_change = []
-
-    @classmethod
-    def set_color(cls, color):
-        UOS_Variables.color_key = color
-        UOS_Variables.color = UOS_Variables.COLORS[color]
-        for item in cls.on_color_change:
-            item()
-
-        for item in UOS_StateMethods.machine.instances.values():
-            item.color_change()
-
     def __init__(self, state_name=None):
         self.state = UOS_StateMethods(self)
         if state_name is None:

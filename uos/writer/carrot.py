@@ -10,7 +10,7 @@ class Carrot:
         w = UOS.text.width(' ')
         cls.image = pygame.Surface((w, h))
         cls.image = cls.image.convert_alpha()
-        cls.image.fill(UOS.text.get_color())
+        cls.image.fill(UOS.color.color)
 
     def __init__(self, carrot=None):
         if Carrot.image is None:
@@ -39,4 +39,4 @@ class Carrot:
     def blink(self):
         self.show = not self.show
 
-UOS.State.on_color_change.append(Carrot.create_image)
+UOS.color.on_color_change.append(Carrot.create_image)

@@ -67,5 +67,5 @@ class Writer:
         if not self.is_finish():
             if not self.state.machine.idle_timer.stop:
                 self.state.machine.idle_timer.stop = True
-        elif self.state.machine.idle_timer.stop and not UOS.Variables.idle:
+        elif self.state.machine.idle_timer.stop and not UOS.idle:
             self.state.machine.idle_timer.restart()

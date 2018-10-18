@@ -13,11 +13,11 @@ class Idle(UOS.State):
 
     def entrance(self, regain_focus):
         self.state.machine.idle_timer.stop = True
-        UOS.Variables.idle = True
+        UOS.idle = True
 
     def event(self, event):
         if event.type == pygame.KEYDOWN:
-            UOS.Variables.idle = False
+            UOS.idle = False
             self.state.machine.idle_timer.reset()
             self.state.flip_back()
 

@@ -4,14 +4,14 @@ from ..uos import UOS
 
 class DefaultCommands(BaseCommand):
     def __init__(self, link):
-        if UOS.User.has_admin:
+        if UOS.user.has_admin:
             self.command_list = {
             'LOGON': self.command_logon,
             'LOGON ?': self.command_logon_help,
             'SHOW TIME': self.command_show_time,
             'MINIGAME': self.command_minigame,
             }
-        elif UOS.User.has_any:
+        elif UOS.user.has_any:
             self.command_list = {
             'LOGON': self.command_logon,
             'LOGON ?': self.command_logon_help,
@@ -37,8 +37,8 @@ class DefaultCommands(BaseCommand):
         self.keys = sorted(self.command_list.keys(), reverse=True)
 
     def command_logon(self, name):
-        if not UOS.User.name:
-            if name in UOS.User.accounts.keys():
+        if not UOS.user.name:
+            if name in UOS.user.accounts.keys():
                 self.writer_add('Enter Password:', protect=True)
                 self.info.name = name
                 self.info.attempts = 3
@@ -49,8 +49,8 @@ class DefaultCommands(BaseCommand):
             self.writer_add('Error: Requires Logout')
 
     def command_logon_password(self, password):
-        if UOS.User.accounts[self.info.name].password == password:
-            UOS.User.set(self.info.name)
+        if UOS.user.accounts[self.info.name].password == password:
+            UOS.user.set(self.info.name)
             self.writer_add('Welcome {0}'.format(self.info.name))
             self.link.state = None
             self.clear_info()
@@ -89,13 +89,13 @@ class DefaultCommands(BaseCommand):
 
     def command_setup_password(self, password):
         if len(password) > 3:
-            UOS.User.create(self.info.name, password, 'admin')
+            UOS.user.create(self.info.name, password, 'admin')
             self.writer_add('New admin {0} has been created.'.format(self.info.name))
-            UOS.User.has_admin = True
-            UOS.User.has_any = True
+            UOS.user.has_admin = True
+            UOS.user.has_any = True
             self.update_commands()
             self.link.state = None
-            UOS.User.set(self.info.name)
+            UOS.user.set(self.info.name)
             self.clear_info()
         else:
             self.writer_clear()

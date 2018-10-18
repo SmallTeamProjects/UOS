@@ -7,4 +7,5 @@ from .user import UOS_User
 from .sound import UOS_Sounds
 from .text import UOS_Text
 from .data import UOS_Data
-from .variables import UOS_Variables
+from .color import UOS_Color
+from .eventbus import EventBus

@@ -20,8 +20,8 @@ class Command:
 
     @classmethod
     def cat_command(cls, text, group, cat):
-        if UOS.User.name:
-            if UOS.User.current.group in group:
+        if UOS.user.name:
+            if UOS.user.current.group in group:
                 key, command = cls.find_key(text, cat)
                 if key:
                     cls.call_command(command, cls.call_args(key, text))

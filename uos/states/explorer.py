@@ -93,10 +93,10 @@ class Explorer(Menu):
                        'e': "Explorer Edit",
                        'd': "Explorer Delete"}[action]
 
-        self.dir = UOS.User.rootpath()
+        self.dir = UOS.user.rootpath()
         self.start_dir = self.dir
-        if UOS.User.has_privilege():
-            self.stop_dir = UOS.Drive.Path.DRIVE
+        if UOS.user.has_privilege():
+            self.stop_dir = UOS.path.drive
         else:
             self.stop_dir = self.start_dir
 
