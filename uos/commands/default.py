@@ -6,6 +6,7 @@ class DefaultCommands(BaseCommand):
     def __init__(self, link):
         if UOS.user.has_admin:
             self.command_list = {
+            'CLEAR': self.command_clear,
             'LOGON': self.command_logon,
             'LOGON ?': self.command_logon_help,
             'SHOW TIME': self.command_show_time,
@@ -13,6 +14,7 @@ class DefaultCommands(BaseCommand):
             }
         elif UOS.user.has_any:
             self.command_list = {
+            'CLEAR': self.command_clear,
             'LOGON': self.command_logon,
             'LOGON ?': self.command_logon_help,
             'SETUP': self.command_setup,
@@ -21,6 +23,7 @@ class DefaultCommands(BaseCommand):
             }
         else:
             self.command_list = {
+            'CLEAR': self.command_clear,
             'SETUP': self.command_setup,
             'SHOW TIME': self.command_show_time,
             'MINIGAME': self.command_minigame,
@@ -35,6 +38,9 @@ class DefaultCommands(BaseCommand):
         self.command_list['LOGON'] = self.command_logon
         self.command_list['LOGON ?'] = self.command_logon_help
         self.keys = sorted(self.command_list.keys(), reverse=True)
+
+    def command_clear(self):
+        self.writer_clear()
 
     def command_logon(self, name):
         if not UOS.user.name:

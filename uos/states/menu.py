@@ -78,7 +78,7 @@ class MenuText(MenuBase):
         self.writer = SimpleNamespace(add=self.add, clear=self.clear)
         self.command = command
         Command.call(self, command)
-        self.name = "  {:<20}   {}".format(name, self.text)
+        self.name = "  {:<16}   {}".format(name, self.text)
 
     def add(self, text, *args, **kwargs):
         self.text = text
@@ -101,7 +101,7 @@ class MenuMenu(UOS.State):
     @classmethod
     def setup(cls):
         cls.user_name = UOS.user.name
-        menu = vars(UOS.user.current).get('menu', UOS.user.default_menu())
+        menu = UOS.user.current.menu
         for key, items in menu.items():
             new_menu = Menu(menu, key, key)
             new_menu.strings = []
@@ -112,6 +112,8 @@ class MenuMenu(UOS.State):
                     new_menu.strings.append(MenuNested(new_menu, enum, *item[1:]))
                 elif item[0] == 'Command':
                     new_menu.strings.append(MenuSelection(new_menu, enum, *item[1:]))
+                elif item[0] == 'Text':
+                    new_menu.strings.append(MenuText(new_menu, enum, *item[1:]))
                 elif item[0] == 'Explorer':
                     new_menu.strings.append(MenuExplorer(new_menu, enum, *item[1:]))
                 else:
@@ -126,8 +128,8 @@ class MenuMenu(UOS.State):
 
     def entrance(self, regain_focus):
         self.regain_focus = regain_focus
-        if self.user_name != UOS.user.name:
-            MenuMenu.setup()
+        #if self.user_name != UOS.user.name:
+        MenuMenu.setup()
 
     def update(self, ticks, delta):
         if self.regain_focus:

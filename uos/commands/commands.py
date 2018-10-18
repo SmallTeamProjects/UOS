@@ -57,7 +57,7 @@ class Command:
     @staticmethod
     def call_args(key, text):
         if key:
-            text = text.lstrip(key).strip()
+            text = text[len(key):].strip()
 
         if ' ' in text:
             return text.split(' ')
@@ -100,7 +100,7 @@ class Command:
         elif 'takes' in error:
             writer.add("{0} takes {1} arguments".format(c, int(error[2]) - 2), 40)
         else:
-            writer.add("Error: " + error, 40)
+            writer.add("Error: " + ' '.join(error))
 
     @staticmethod
     def find_key(line, commands):

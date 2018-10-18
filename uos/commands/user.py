@@ -21,6 +21,10 @@ class UserCommands(BaseCommand):
             'LOGOFF ?': self.command_logoff_help,
             'MAIL': self.command_mail,
             'MENU': self.command_menu,
+            'MENU ADD': self.command_menu_add,
+            'MENU EDIT': self.command_menu_edit,
+            'MENU REMOVE': self.command_menu_remove,
+            'MENU RESET': self.command_menu_reset,
             'MOUNT': self.command_mount,
             'MOVE DIR': self.command_move_dir,
             'MOVE FILE': self.command_move_file,
@@ -166,6 +170,102 @@ class UserCommands(BaseCommand):
 
     def command_mail(self):
         print('invoke the mail utility')
+
+    def command_menu(self):
+        self.link.action.flip('MenuMenu')
+
+    def command_menu_add(self, menu_name, index, action, name, *args):
+        default = list(UOS.user.default_menu().keys())
+        default.remove('MainMenu')
+        if '_' in name:
+            name = name.replace('_', ' ')
+
+        if index.isdigit():
+            index = int(index)
+        else:
+            self.writer_add('Index must be an integer')
+            return
+
+        if menu_name not in default:
+            if menu_name in UOS.user.current.menu.keys():
+                command = ' '.join(args)
+                allowed_actions = { '-t': 'Text',
+                                  '-c': 'Command',
+                                  '-s': 'SubMenu',
+                                  '-n': 'Nested',
+                                  'SUBMENU': 'SubMenu',
+                                  'COMMAND': 'Command',
+                                  'NESTED': 'Nested',
+                                  'TEXT': 'Text'
+                                }
+
+                if action in allowed_actions.keys():
+                    action = allowed_actions[action]
+                else:
+                    self.writer_add(action + ' invalid action')
+                    return
+
+                UOS.user.current.menu[menu_name].insert(index, [action, name, command])
+                if action == "SUBMENU":
+                    if not UOS.user.current.menu.get(name, False):
+                        UOS.user.current.menu[name] = []
+                UOS.user.save()
+
+            else:
+                self.writer_add(menu_name + " does not exists")
+        else:
+            self.writer_add(menu_name + " item can not be added")
+
+    def command_menu_edit(self, menu_name, index, action, *args):
+        default = list(UOS.user.default_menu().keys())
+        default.remove('MainMenu')
+        if index.isdigit():
+            index = int(index)
+        else:
+            self.writer_add('Index must be an integer')
+            return
+
+        command = ' '.join(args)
+        if menu_name not in default:
+            if menu_name in UOS.user.current.menu.keys():
+                if action in ['-t', 'TEXT']:
+                    item = UOS.user.current.menu[menu_name][index][1]
+                    UOS.user.current.menu[menu_name][index][1] = command
+                    self.writer_add(item + " been change to " + command)
+                    UOS.user.save()
+                elif action in ['-c', 'COMMAND']:
+                    item = UOS.user.current.menu[menu_name][index][2]
+                    UOS.user.current.menu[menu_name][index][2] = command
+                    self.writer_add(item + " been change to " + command)
+                    UOS.user.save()
+            else:
+                self.writer_add(menu_name + " does not exists")
+        else:
+            self.writer_add(menu_name + " item can not be altered")
+
+    def command_menu_remove(self, menu_name, index):
+        default = list(UOS.user.default_menu().keys())
+        default.remove('MainMenu')
+        if index.isdigit():
+            index = int(index)
+        else:
+            self.writer_add('Index must be an integer')
+            return
+
+        if menu_name not in default:
+            if menu_name in UOS.user.current.menu.keys():
+                item = UOS.user.current.menu[menu_name].pop(index)
+                self.writer_add(item[1] + " has been removed")
+                UOS.user.save()
+            else:
+                self.writer_add(menu_name + " does not exists")
+        else:
+            self.writer_add(menu_name + " item can not be removed")
+
+    def command_menu_reset(self):
+        UOS.user.current.menu = UOS.user.default_menu()
+        self.writer_add("Menu has been reset to default")
+        UOS.user.save()
 
     def command_mount(self):
         print('look for external storage')
@@ -405,6 +505,3 @@ class UserCommands(BaseCommand):
                           "MAIL ?",
                           "EXIT ?",
                           "HELP or ?"])
-
-    def command_menu(self):
-        self.link.action.flip('MenuMenu')

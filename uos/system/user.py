@@ -126,6 +126,11 @@ class UOS_User:
             self.paths.current = self.rootpath()
             if self.bus.uos.color.key != self.current.color:
                 self.bus.uos.color.change_color(self.current.color)
+
+            # will be remove later
+            if not vars(self.current).get('menu', False):
+                self.current.menu = self.default_menu()
+                self.save()
         else:
             self.current = None
             self.paths.current = self.paths.drive
