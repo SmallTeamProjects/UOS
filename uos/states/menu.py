@@ -177,6 +177,11 @@ class Menu(UOS.State):
     def entrance(self, regain_focus):
         self.writer.flush()
         self.select = 0
+        if isinstance(self.strings[self.select], MenuText):
+            while (self.selection[self.select] is None or
+                   isinstance(self.strings[self.select], MenuText)):
+                self.select += 1
+                self.select %= len(self.selection)
 
     def event(self, event):
         if self.writer.is_finish():
@@ -185,7 +190,8 @@ class Menu(UOS.State):
                     UOS.sounds.play('scroll')
                     self.select += 1
                     self.select %= len(self.selection)
-                    while self.selection[self.select] is None:
+                    while (self.selection[self.select] is None or
+                           isinstance(self.strings[self.select], MenuText)):
                         self.select += 1
                         self.select %= len(self.selection)
 
@@ -193,7 +199,8 @@ class Menu(UOS.State):
                     UOS.sounds.play('scroll')
                     self.select -= 1
                     self.select %= len(self.selection)
-                    while self.selection[self.select] is None:
+                    while (self.selection[self.select] is None or
+                           isinstance(self.strings[self.select], MenuText)):
                         self.select -= 1
                         self.select %= len(self.selection)
 
