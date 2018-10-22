@@ -72,13 +72,17 @@ class MenuSelection(MenuBase):
         #Command.call(self.parent, self.command, True)
 
 class MenuText(MenuBase):
-    def __init__(self, parent, position, name, command):
+    def __init__(self, parent, position, name, info):
         MenuBase.__init__(self, parent, position, None)
         # Give command a fake writer
         self.writer = SimpleNamespace(add=self.add, clear=self.clear)
-        self.command = command
-        Command.call(self, command)
-        self.name = "  {:<16}   {}".format(name, self.text)
+        self.name = name
+        for item in info:
+            if item[0] == '-t':
+                self.name += "  " + item[1]
+            elif item[0] == '-c':
+                Command.call(self, item[1])
+                self.name += " " + self.text
 
     def add(self, text, *args, **kwargs):
         self.text = text
@@ -110,7 +114,7 @@ class MenuMenu(UOS.State):
                     new_menu.strings.append(SubMenu(new_menu, enum, *item[1:]))
                 elif item[0] == 'Nested':
                     new_menu.strings.append(MenuNested(new_menu, enum, *item[1:]))
-                elif item[0] == 'Command':
+                elif item[0] == 'Selection':
                     new_menu.strings.append(MenuSelection(new_menu, enum, *item[1:]))
                 elif item[0] == 'Text':
                     new_menu.strings.append(MenuText(new_menu, enum, *item[1:]))

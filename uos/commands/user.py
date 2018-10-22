@@ -174,27 +174,78 @@ class UserCommands(BaseCommand):
     def command_menu(self):
         self.link.action.flip('MenuMenu')
 
-    def command_menu_add(self, menu_name, index, action, name, *args):
-        default = list(UOS.user.default_menu().keys())
-        default.remove('MainMenu')
-        if '_' in name:
-            name = name.replace('_', ' ')
-
+    def command_menu_add(self, menu_name, index, *args):
         if index.isdigit():
             index = int(index)
         else:
             self.writer_add('Index must be an integer')
             return
 
+        default = list(UOS.user.default_menu().keys())
+        default.remove('MainMenu')
+
+        # looking for a simple 2 or 3 argruments command
+        if len(args) in [2,3]:
+            boolean_simple = len(args)
+            for arg in args:
+                if not isinstance(arg, str):
+                    boolean_simple = False
+                if ',' in arg:
+                    boolean_simple = False
+        else:
+            boolean_simple = False
+
+        if boolean_simple == 2:
+            command = ""
+            action, name = args
+        elif boolean_simple:
+            action, name, command = args
+        else:
+            arg_split = []
+            arg_data = []
+            for arg in args:
+                if arg.startswith('-') and arg_data != []:
+                    arg_split.append(arg_data)
+                    arg_data = [arg]
+                elif arg.endswith(','):
+                    arg_data.append(arg[:-1])
+                    arg_split.append(arg_data)
+                    arg_data = []
+                else:
+                    arg_data.append(arg)
+
+            if arg_data != []:
+                arg_split.append(arg_data)
+
+            if len(arg_split[0]) == 2:
+                action = arg_split[0][0]
+                name = arg_split[0][1]
+            elif len(arg_split[0]) > 2:
+                action = arg_split[0][0]
+                name = arg_split[0][1:]
+
+            if len(arg_split) > 1:
+                if action in ['-t', 'TEXT']:
+                    command = []
+                    for arg in arg_split[1:]:
+                        command.append((arg[0], ' '.join(arg[1:])))
+                else:
+                    if len(arg_split[1:]) == 1:
+                        command = ' '.join(arg_split[1])
+                    else:
+                        self.writer_add('To many arguments')
+                        return
+            else:
+                command = ""
+
         if menu_name not in default:
             if menu_name in UOS.user.current.menu.keys():
-                command = ' '.join(args)
                 allowed_actions = { '-t': 'Text',
-                                  '-c': 'Command',
-                                  '-s': 'SubMenu',
+                                  '-m': 'SubMenu',
                                   '-n': 'Nested',
+                                  '-s': 'Selection',
+                                  'SELECTION': 'Selection',
                                   'SUBMENU': 'SubMenu',
-                                  'COMMAND': 'Command',
                                   'NESTED': 'Nested',
                                   'TEXT': 'Text'
                                 }
@@ -206,7 +257,8 @@ class UserCommands(BaseCommand):
                     return
 
                 UOS.user.current.menu[menu_name].insert(index, [action, name, command])
-                if action == "SUBMENU":
+                # create an empty submenu
+                if action == "SubMenu":
                     if not UOS.user.current.menu.get(name, False):
                         UOS.user.current.menu[name] = []
                 UOS.user.save()
@@ -233,7 +285,7 @@ class UserCommands(BaseCommand):
                     UOS.user.current.menu[menu_name][index][1] = command
                     self.writer_add(item + " been change to " + command)
                     UOS.user.save()
-                elif action in ['-c', 'COMMAND']:
+                elif action in ['-s', 'SELECTION']:
                     item = UOS.user.current.menu[menu_name][index][2]
                     UOS.user.current.menu[menu_name][index][2] = command
                     self.writer_add(item + " been change to " + command)

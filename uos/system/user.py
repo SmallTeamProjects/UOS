@@ -11,6 +11,7 @@ class UOS_User:
         self.current = None
         self.accounts = {}
         self._hex = '0x5a0'
+        self.menu_version = "0.1.0"
 
         self.has_any = False
         self.has_admin = False
@@ -28,11 +29,11 @@ class UOS_User:
             "MainMenu": [
                 ["SubMenu", "Documents", "Documents"],
                 ["SubMenu" ,"Settings", "Settings"],
-                ["Command", "Logout", "LOGOFF"],
-                ["Command", "Shutdown", "SET HALT"]
+                ["Selection", "Logout", "LOGOFF"],
+                ["Selection", "Shutdown", "SET HALT"]
             ],
             "Documents": [
-                ["Command", "Create", "CREATE FILE"],
+                ["Selection", "Create", "CREATE FILE"],
                 ["Explorer", "> Read", "r"],
                 ["Explorer", "> Edit", "e"],
                 ["Explorer", "> Delete", "d"],
@@ -41,9 +42,9 @@ class UOS_User:
                 ["Nested", "Terminal Color", "TerminalColor"]
             ],
             "TerminalColor": [
-                ["Command", "Green", "SET COLOR green"],
-                ["Command", "Amber", "SET COLOR amber"],
-                ["Command", "Blue", "SET COLOR blue"]
+                ["Selection", "Green", "SET COLOR green"],
+                ["Selection", "Amber", "SET COLOR amber"],
+                ["Selection", "Blue", "SET COLOR blue"]
             ]
         }
 
@@ -86,7 +87,8 @@ class UOS_User:
             root = root,
             group = group,
             color = 'green',
-            menu = self.default_menu())
+            menu = self.default_menu(),
+            menu_version = self.menu_version)
 
         path = os.path.join(self.paths.database, root)
         os.makedirs(path)
@@ -128,7 +130,8 @@ class UOS_User:
                 self.bus.uos.color.change_color(self.current.color)
 
             # will be remove later
-            if not vars(self.current).get('menu', False):
+            if vars(self.current).get('menu_version', "") != self.menu_version:
+                self.current.menu_version = self.menu_version
                 self.current.menu = self.default_menu()
                 self.save()
         else:
