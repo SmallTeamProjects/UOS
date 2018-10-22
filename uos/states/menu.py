@@ -76,13 +76,22 @@ class MenuText(MenuBase):
         MenuBase.__init__(self, parent, position, None)
         # Give command a fake writer
         self.writer = SimpleNamespace(add=self.add, clear=self.clear)
-        self.name = name
+        # Single line of text
+        if isinstance(name, list):
+            self.name = ' '.join(name)
+            return
+        else:
+            self.name = name
+
         for item in info:
-            if item[0] == '-t':
-                self.name += "  " + item[1]
-            elif item[0] == '-c':
-                Command.call(self, item[1])
-                self.name += " " + self.text
+            if isinstance(item, tuple):
+                if item[0] == '-t':
+                    self.name += "  " + item[1]
+                elif item[0] == '-c':
+                    Command.call(self, item[1])
+                    self.name += " " + self.text
+            else:
+                self.name += " Menu Error"
 
     def add(self, text, *args, **kwargs):
         self.text = text
