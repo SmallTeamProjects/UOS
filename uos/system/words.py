@@ -1,4 +1,4 @@
-from random import choice, random, shuffle
+from random import choice, random, shuffle, randint
 words = {
 5: ['ABOUT', 'ABOVE', 'ACTOR', 'ADAPT', 'ADDED', 'ADEPT', 'ADOBE', 'AFTER', 'AGAIN', 'AGENT',
     'AGILE', 'AGREE', 'AHEAD', 'ALARM', 'ALERT', 'ALIEN', 'ALIKE', 'ALIVE', 'ALLEY', 'ALLOW',
@@ -232,6 +232,32 @@ words = {
 }
 
 
-def get_random_wordlist(key, word_count):
-    shuffle(words[key])
-    return words[key][:word_count]
+def get_random_word(key):
+    word = choice(words[key])
+    return word
+
+
+def get_words(key, secret_word, word_count):
+    word_set = words[key]
+    word_list = [secret_word]
+    for x in range(word_count):
+        found = False
+        count = 0
+        while not found:
+            # get random word from word_set
+            word = choice(word_set)
+            # test likeness of word to secret word
+            likeness = 0
+            target_likeness = randint(1,3)
+            for enum, letter in enumerate(secret_word):
+                if word[enum] == letter:
+                    likeness += 1
+            if word not in word_list and likeness >= target_likeness or count > 100:  # important to avoid infinite loop
+                word_list.append(word)
+                print('likeness:' + str(likeness))
+                print('target likeness:' + str(target_likeness))
+                print('count:' + str(count))
+                found = True
+            count += 1
+        shuffle(word_list)
+    return word_list

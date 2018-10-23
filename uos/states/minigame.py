@@ -6,7 +6,7 @@ from random import randint, random, choice
 from ..uos import UOS
 from ..writer import Writer
 from ..writer.carrot import Carrot
-from ..system.words import get_random_wordlist
+from ..system.words import get_random_word, get_words
 
 
 class MinigameBase(UOS.State):
@@ -101,7 +101,7 @@ class MinigameBase(UOS.State):
         self.generate_outline(1, self.hex_seed, 16)
         self.generate_outline(2, self.hex_seed + 192, 16)
         # temporary section
-        self.writer.add(3, '> CABINET')
+        self.writer.add(3, '> ' + self.secret_word)
         self.writer.add(3, '> Entry denied.')
         self.writer.add(3, '> Likeness=0')
 
@@ -142,6 +142,7 @@ class MinigameBase(UOS.State):
 
                 elif event.key == pygame.K_RETURN:
                     UOS.sounds.play('password', 'attempt')
+                    self.get_likeness(self.secret_word) # temporary should input highlighted word
                     # todo get selected word
 
                 elif event.key == pygame.K_TAB:
@@ -180,34 +181,14 @@ class MinigameBase(UOS.State):
         self.carrot.pos %= 12
         self.update_carrot_data()
 
-    # randomizes world locations, returns 2d array with paired index and word
-    def find_places(self,words,difficulty,characters):
-        places = []
-        placed = False
-        blacklist = []
-        for x in range(len(words)):
-            placed = False
-            while not placed and len(blacklist) < characters * 0.8:
-                place = math.floor(random.random() * (characters - difficulty))
-                # check blacklist array to make sure there isn't a word conflict
-                if place in blacklist < 0:
-                    places.append([place,words[x]])
-                    places = True
-                    # add used spaces to blacklist array
-                    j = place - difficulty
-                    while j <= place + difficulty:
-                        blacklist.append(j)
-                        j += 1
-        return places.sort()  # this might need tweaking
-
     # creates the full grid by filling remaining space with junk
     def generate_display(self):
         self.display_buffer = ''
         self.hex_seed = randint(4096, 65535)
-        word_count = 100 // self.difficulty
-        random_words = get_random_wordlist(self.difficulty, word_count)
-        self.secret_word = choice(random_words)
-
+        word_count = randint(self.difficulty // 2 + 3, self.difficulty + self.difficulty // 2)
+        self.secret_word = get_random_word(self.difficulty)
+        random_words = get_words(self.difficulty, self.secret_word, word_count)
+        print(word_count)
         length = self.characters - word_count * self.difficulty
         low = length // word_count // 2
         junk = SimpleNamespace(
@@ -283,43 +264,21 @@ class MinigameBase(UOS.State):
             hex_num += 12
 
     # gets character likeness
-    def get_likeness(self, word, visible=True):
+    def get_likeness(self, word):
         likeness = 0
         for enum, letter in enumerate(self.secret_word):
             if word[enum] == letter:
                 likeness += 1
 
-        if visible:
-            if likeness == len(secret_word):
-                UOS.sounds.play('good')
-                # todo pass valid logon
-            else:
-                UOS.sounds.play('bad')
-                self.writer.add(3, '> Entry denied.')
-                self.writer.add(3, '> Likeness=' + likeness)
-                self.attempts -= 1
-                # todo if 0 attempts lock
+        if likeness == len(self.secret_word):
+            UOS.sounds.play('password', 'good')
+            # todo pass valid logon
         else:
-            return likeness
-
-    # make sure words are random, but at least similar to secret word
-    def get_words(self,secret_word):
-        word = ''
-        likeliness = 0
-        wordset = []  # todo access to word list based on length
-        words = [secret_word]
-        for x in range(15):
-            found = False
-            count = 0
-            while not found:
-                # get random word from wordset
-                word = wordset[randint(0,len(wordset))]
-                # test likeness of word to secret word
-                likeliness = self.get_likeness(word,False)
-                if word not in words and likeliness < randint(1,3) or count > 100:  # important to avoid infinite loop
-                    words.append(word)
-                    found = True
-        return words
+            UOS.sounds.play('password', 'bad')
+            self.writer.add(3, '> Entry denied.')
+            self.writer.add(3, '> Likeness=' + likeness)
+            self.attempts -= 1
+            # todo if 0 attempts lock
 
     # runs bracket functions
     def hack(self):
