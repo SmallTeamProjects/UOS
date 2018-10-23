@@ -62,7 +62,7 @@ class UserMenu:
                 name = arg_split[0][1]
             elif len(arg_split[0]) > 2:
                 action = arg_split[0][0]
-                name = arg_split[0][1:]
+                name = ' '.join(arg_split[0][1:])
 
             if len(arg_split) > 1:
                 if action in ['-t', 'TEXT']:
@@ -99,8 +99,8 @@ class UserMenu:
                 UOS.user.current.menu[menu_name].insert(index, [action, name, command])
                 # create an empty submenu
                 if action == "SubMenu":
-                    if not UOS.user.current.menu.get(name, False):
-                        UOS.user.current.menu[name] = []
+                    if not UOS.user.current.menu.get(command, False):
+                        UOS.user.current.menu[command] = []
                 UOS.user.save()
 
             else:
