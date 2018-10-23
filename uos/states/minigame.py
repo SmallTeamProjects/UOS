@@ -189,7 +189,7 @@ class MinigameBase(UOS.State):
         self.secret_word = get_random_word(self.difficulty)
         random_words = get_words(self.difficulty, self.secret_word, word_count)
         print(word_count)
-        length = self.characters - word_count * self.difficulty
+        length = self.characters - self.difficulty - 1
         low = length // word_count // 2
         junk = SimpleNamespace(
             low = low,
@@ -197,7 +197,8 @@ class MinigameBase(UOS.State):
             high = length // word_count,
             count = low + 1,
             word = 0,
-            offset = 0
+            offset = 0,
+            value = int((length // word_count - low) * 0.3)
         )
 
         # remove . from punctuation
@@ -210,13 +211,18 @@ class MinigameBase(UOS.State):
             boolean_good = False
             if junk.word < word_count:
                 if junk.count > junk.low + junk.offset and randint(0, 25) == 0:
-                    junk.offset += 2
+                    junk.offset += junk.value
                     boolean_good = True
                 elif junk.count > junk.mid + junk.offset and randint(0, 5) == 0:
-                    junk.offset += 1
+                    junk.offset += junk.value // 2
                     boolean_good = True
                 elif junk.count > junk.high:
-                    junk.offset -= 1
+                    value = junk.value // 4
+                    if value > 0:
+                        junk.offset -= value
+                    else:
+                        junk.offset -= 1
+
                     boolean_good = True
 
             if boolean_good:
