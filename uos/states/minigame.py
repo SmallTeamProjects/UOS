@@ -288,24 +288,25 @@ class MinigameBase(UOS.State):
 
     # highlight bracket sets
     def get_bracket_sets(self, lines):
-        openers = ['(', '[', '{', '<']
-        closers = [')', ']', '}', '>']
+        openers = '([{<'
+        closers = ')]}>'
         sets = []
         index = 0
         # iterates over each line to find sets
-        for x in range(len(lines)):
-            for j in range(len(lines[x])):
-                letter = lines[x][j]
+        for enum, line in enumerate(lines):
+            j = 0
+            n = enum * self.line_length
+            while j < self.line_length:
+                letter = line[j]
                 if letter in openers:
                     br_index = openers.index(letter)
-                    start_index = index
-                    queue = lines[x]
-                    if closers[br_index] in queue:
-                        end_index = queue.index(closers[br_index]) - queue.index(openers[br_index])
-                        print('Found:' + openers[br_index] + closers[br_index])
-                        if queue.index(closers[br_index]) > queue.index(openers[br_index]):
-                            sets.append((start_index, start_index + end_index + 1))
-                index += 1
+                    start_index = j
+                    closer = closers[br_index]
+                    if closer in line[start_index:]:
+                        end_index = line.find(closer, start_index)
+                        j += end_index
+                        sets.append((start_index + n, end_index + n + 1))
+                j += 1
         return sets
 
     # runs bracket functions
