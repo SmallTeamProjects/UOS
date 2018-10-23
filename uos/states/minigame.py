@@ -188,7 +188,6 @@ class MinigameBase(UOS.State):
         word_count = randint(self.difficulty // 2 + 3, self.difficulty + self.difficulty // 2)
         self.secret_word = get_random_word(self.difficulty)
         random_words = get_words(self.difficulty, self.secret_word, word_count)
-        print(word_count)
         length = self.characters - self.difficulty - 1
         low = length // word_count // 2
         junk = SimpleNamespace(
@@ -222,7 +221,6 @@ class MinigameBase(UOS.State):
                         junk.offset -= value
                     else:
                         junk.offset -= 1
-
                     boolean_good = True
 
             if boolean_good:
@@ -238,9 +236,11 @@ class MinigameBase(UOS.State):
 
         # split into lines
         self.display_buffer = [self.display_buffer[i:i + 12] for i in range(0, self.characters, 12)]
+        hposition += self.get_bracket_sets(self.display_buffer) # this adds bracket sets to hposition
         self.generate_highlight_positions(hposition)
 
     def generate_highlight_positions(self, hposition):
+        print(hposition)
         self.highlight_position = []
         self.highlight_images = None
         for position in hposition:
@@ -286,6 +286,28 @@ class MinigameBase(UOS.State):
             self.attempts -= 1
             # todo if 0 attempts lock
 
+    # highlight bracket sets
+    def get_bracket_sets(self, lines):
+        openers = ['(', '[', '{', '<']
+        closers = [')', ']', '}', '>']
+        sets = []
+        index = 0
+        # iterates over each line to find sets
+        for x in range(len(lines)):
+            for j in range(len(lines[x])):
+                letter = lines[x][j]
+                if letter in openers:
+                    br_index = openers.index(letter)
+                    start_index = index
+                    queue = lines[x]
+                    if closers[br_index] in queue:
+                        end_index = queue.index(closers[br_index]) - queue.index(openers[br_index])
+                        print('Found:' + openers[br_index] + closers[br_index])
+                        if queue.index(closers[br_index]) > queue.index(openers[br_index]):
+                            sets.append((start_index, start_index + end_index + 1))
+                index += 1
+        return sets
+
     # runs bracket functions
     def hack(self):
         roll = randint(0,4)
@@ -294,27 +316,6 @@ class MinigameBase(UOS.State):
         else:
             self.remove_dud()
 
-    # highlight bracket sets
-    def highlight_bracket_set(self,lines):
-        openers = ['(','[','{','<']
-        closers = [')',']','}','>']
-        sets = []
-        index = 0
-        # iterates over each line to find sets
-        for x in range(len(lines)):
-            for j in range(len(lines[x])):
-                letter = lines[x][j]
-                if letter in openers >=0:
-                    br_index = letter in openers
-                    queue = lines[x:j]  # not sure if this is right
-                    if closers[br_index] in queue > 0:
-                        end_index = closers[br_index] in queue
-                        snippet = queue[0:end_index + 1]
-                        # supposed to check for letters
-                        if any((c in string.ascii_uppercase) for c in snippet):
-                            index +=1
-                        else:
-                            sets.append([index, index + end_index, snippet])
 
     # removes dud
     def remove_dud(self):
