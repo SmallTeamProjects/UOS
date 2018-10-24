@@ -56,10 +56,16 @@ class MinigameBase(UOS.State):
         for pos in self.highlight_position:
             for pline, p in zip(pos['line'], pos['pos']):
                 if pline == line:
-                    if p[0] <= self.carrot.pos < p[1]:
-                        position = pos
-                        boolean_good = True
-                        break
+                    if pos['type'] == 'words':
+                        if p[0] <= self.carrot.pos < p[1]:
+                            position = pos
+                            boolean_good = True
+                            break
+                    elif pos['type'] == 'brackets':
+                        if p[0] == self.carrot.pos or p[1] - 1 == self.carrot.pos:
+                            position = pos
+                            boolean_good = True
+                            break
 
             if boolean_good:
                 break
@@ -165,7 +171,8 @@ class MinigameBase(UOS.State):
 
     def event_update_pos(self, inc):
         UOS.sounds.play('scroll')
-        if self.carrot.hposition:
+        # if words then skip to front or back
+        if self.carrot.hposition and self.carrot.hposition['type'] == 'words':
             for line, pos in zip(self.carrot.hposition['line'], self.carrot.hposition['pos']):
                 i = (self.carrot.block - 1) * 16
                 if self.carrot.line + i == line:
@@ -236,12 +243,12 @@ class MinigameBase(UOS.State):
 
         # split into lines
         self.display_buffer = [self.display_buffer[i:i + 12] for i in range(0, self.characters, 12)]
-        hposition += self.get_bracket_sets(self.display_buffer) # this adds bracket sets to hposition
-        self.generate_highlight_positions(hposition)
+        self.highlight_position = self.generate_highlight_positions(hposition, 'words')
+        self.highlight_position.extend(self.get_bracket_sets())
 
-    def generate_highlight_positions(self, hposition):
+    def generate_highlight_positions(self, hposition, type):
         print(hposition)
-        self.highlight_position = []
+        highlight_position = []
         self.highlight_images = None
         for position in hposition:
             # line numbers
@@ -254,12 +261,14 @@ class MinigameBase(UOS.State):
                     p = p[0], 12
 
                 # line number, position
-                self.highlight_position.append({'line':(dx,), 'pos':(p,)})
+                highlight_position.append({'line':(dx,), 'pos':(p,), 'type':type})
             else:
                 p1 = p[0], 12
                 p2 = 0, p[1]
                 # (line number, position), (line number, position)
-                self.highlight_position.append({'line':(dx,dy), 'pos':(p1,p2)})
+                highlight_position.append({'line':(dx,dy), 'pos':(p1,p2), 'type':type})
+
+        return highlight_position
 
     def generate_outline(self, index, hex_seed, count):
         hex_num = hex_seed
@@ -287,16 +296,17 @@ class MinigameBase(UOS.State):
             # todo if 0 attempts lock
 
     # highlight bracket sets
-    def get_bracket_sets(self, lines):
+    def get_bracket_sets(self):
         openers = '([{<'
         closers = ')]}>'
         sets = []
         index = 0
         # iterates over each line to find sets
-        for enum, line in enumerate(lines):
+        for enum, line in enumerate(self.display_buffer):
             j = 0
             n = enum * self.line_length
-            while j < self.line_length:
+            # find every possible match
+            for j in range(self.line_length):
                 letter = line[j]
                 if letter in openers:
                     br_index = openers.index(letter)
@@ -304,10 +314,8 @@ class MinigameBase(UOS.State):
                     closer = closers[br_index]
                     if closer in line[start_index:]:
                         end_index = line.find(closer, start_index)
-                        j += end_index
                         sets.append((start_index + n, end_index + n + 1))
-                j += 1
-        return sets
+        return self.generate_highlight_positions(sets, 'brackets')
 
     # runs bracket functions
     def hack(self):
