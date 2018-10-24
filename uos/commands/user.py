@@ -26,7 +26,7 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
             'SET HALT/RESTART MAINT' : self.command_set_halt_restart_maintainence,
             'SET HOST': self.command_set_host,
             'SET INTERVAL':self.command_set_interval,
-            'SET TERMINAL COLOR': self.command_set_color,
+            'SET TERMINAL COLOR': self.command_set_terminal_color,
             'SET TERMINAL HEADER': self.command_set_header,
             'SET TERMINAL/INQUIRE': self.command_set_inquire,
             'SET TERMINAL INTERVAL':self.command_set_interval,
@@ -130,6 +130,8 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
     def command_set_interval(self, interval):
         if interval.isdigit():
             UOS.interval = int(interval)
+            UOS.settings.interval = int(interval)
+            UOS.save_settings()
         else:
             self.writer_add("Intervals must be a number")
 
@@ -141,8 +143,9 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
         else:
             self.writer_add("Invalid color")
 
-    def command_set_header(self):
-        print('set header text')
+    def command_set_header(self, *args):
+        UOS.settings.header = ' '.join(args)
+        UOS.save_settings()
 
     def command_set_inquire(self):
         self.writer_clear()
@@ -169,6 +172,16 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
                      "    /PROTECTION-OWNER",
                      "    /PROTECTION-PASSWORD",
                      "SET ?"])
+
+    def command_set_terminal_color(self, color):
+        if color in UOS.color.COLORS:
+            UOS.settings.color = color
+            UOS.save_settings()
+            UOS.user.current.color = color
+            UOS.user.save()
+            UOS.color.change_color(color)
+        else:
+            self.writer_add("Invalid color")
 
     def command_show_default(self):
         self.writer_add('current directory: ' + UOS.drive.path.current)

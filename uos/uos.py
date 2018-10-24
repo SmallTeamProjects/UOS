@@ -1,5 +1,6 @@
 import os
 import pygame
+from types import SimpleNamespace
 from .system import *
 from .system.timer import TickTimerData
 
@@ -14,16 +15,32 @@ class UOS:
         return cls.interval
 
     @classmethod
+    def load_settings(cls):
+        if os.path.exists(cls.path.settings):
+            cls.settings = SimpleNamespace(**cls.drive.deserialize_data(cls.path.settings))
+        else:
+            cls.settings = SimpleNamespace(interval=30,
+                                           header='Welcome to ROBCO Industries (TM) Termlink',
+                                           color='green')
+
+    @classmethod
     def run(cls, state):
         UOS_StateMachine.main_loop(state)
 
     @classmethod
+    def save_settings(cls):
+        cls.drive.serialize_data(vars(cls.settings), cls.path.settings)
+
+    @classmethod
     def setup(cls):
-        TickTimerData.setup(cls.get_interval)
         cls.bus = EventBus(cls)
-        cls.data = UOS_Data()
         cls.drive = UOS_Drive(cls.bus)
         cls.path = cls.drive.path
+        cls.load_settings()
+        cls.interval = cls.settings.interval
+        cls.color.setup(cls.settings.color)
+        TickTimerData.setup(cls.get_interval)
+        cls.data = UOS_Data()
         cls.sounds = UOS_Sounds()
         cls.user = UOS_User(cls.bus)
         cls.text = UOS_Text(cls.color)

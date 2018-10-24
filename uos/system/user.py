@@ -11,7 +11,7 @@ class UOS_User:
         self.current = None
         self.accounts = {}
         self._hex = '0x5a0'
-        self.menu_version = "0.1.0"
+        self.menu_version = "0.1.1"
 
         self.has_any = False
         self.has_admin = False
@@ -42,9 +42,9 @@ class UOS_User:
                 ["Nested", "Terminal Color", "TerminalColor"]
             ],
             "TerminalColor": [
-                ["Selection", "Green", "SET COLOR green"],
-                ["Selection", "Amber", "SET COLOR amber"],
-                ["Selection", "Blue", "SET COLOR blue"]
+                ["Selection", "Green", "SET TERMINAL COLOR green"],
+                ["Selection", "Amber", "SET TERMINAL COLOR amber"],
+                ["Selection", "Blue", "SET TERMINAL COLOR blue"]
             ]
         }
 
@@ -132,7 +132,7 @@ class UOS_User:
             # will be remove later
             if vars(self.current).get('menu_version', "") != self.menu_version:
                 self.current.menu_version = self.menu_version
-                self.current.menu = self.default_menu()
+                self.current.menu.update(self.default_menu())
                 self.save()
         else:
             self.current = None

@@ -4,9 +4,11 @@ class UOS_Color:
                        'amber':(255, 182, 66),
                        'blue':(46, 207, 255)}
 
-        self.key = 'green'
-        self.color = self.COLORS[self.key]
         self.on_color_change = []
+
+    def setup(self, color_key):
+        self.key = color_key
+        self.color = self.COLORS[color_key]
 
     def change_color(self, color):
         self.key = color

@@ -15,7 +15,7 @@ class Terminal(UOS.State):
             y += UOS.text.get_linesize()
             rect = pygame.Rect(x, y, w, self.state.machine.rect.bottom - y)
             self.writer.add_input(rect)
-            self.writer.add(0, 'Welcome to ROBCO Industries (TM) Termlink')
+            self.writer.add(0, UOS.settings.header)
         else:
             for item in UOS.data.intro:
                 self.writer.add_input(self.state.machine.rect.inflate(-20, -20))
