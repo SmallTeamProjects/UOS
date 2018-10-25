@@ -70,6 +70,7 @@ class MinigameBase(UOS.State):
             if boolean_good:
                 break
 
+        self.carrot.text = ""
         self.carrot.hposition = position
         if position:
             self.highlight_images = []
@@ -77,6 +78,7 @@ class MinigameBase(UOS.State):
             y = self.writer.blocks[self.carrot.block].rect.top
             for pline, p in zip(position['line'], position['pos']):
                 text = self.display_buffer[pline][p[0]:p[1]]
+                self.carrot.text += text
                 pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline % 16) + y
                 self.highlight_images.append((UOS.text(text, (0,0,0), UOS.color.color), pos))
         else:
