@@ -123,7 +123,6 @@ class MinigameBase(UOS.State):
             self.generate_display()
             self.display_string()
             self.carrot_hposition = None
-            self.carrot.show = False
             self.carrot.init = False
             self.carrot.block = 1
             self.carrot.line = 0
@@ -132,6 +131,7 @@ class MinigameBase(UOS.State):
             self.carrot.topleft = [self.carrot.width, self.top_height]
             self.highlight_images = None
 
+        self.carrot.show = False
         self.writer.flush()
         self.select = 0
 
@@ -280,8 +280,8 @@ class MinigameBase(UOS.State):
         hex_num = hex_seed
         i = (index - 1) * 16
         for x in range(count):
-            self.writer.add(index, hex(hex_num).upper() + ' ............', 20,
-                update_after = (20, 7, self.display_buffer[x + i]))
+            self.writer.add(index, hex(hex_num).upper() + ' ............', -1,
+                update_after = (-1, 7, self.display_buffer[x + i]))
             hex_num += 12
 
     # highlight bracket sets
@@ -323,6 +323,8 @@ class MinigameBase(UOS.State):
             self.writer.add(3, '> Entry denied.')
             self.writer.add(3, '> Likeness=' + str(likeness))
             self.attempts -= 1
+            attempt_line = self.writer.get_line(0, 2)
+            attempt_line.set_text(attempt_line.get_text()[:-2])
             # todo if 0 attempts lock
         elif self.carrot.type is 'brackets':
             self.hack()
@@ -372,6 +374,8 @@ class MinigameBase(UOS.State):
         UOS.sounds.play('password', 'attempt')
         self.writer.add(3, '> Tries Reset.')
         self.attempts = 4
+        attempt_line = self.writer.get_line(0, 2)
+        attempt_line.set_text(self.attempts_remaining(self.attempts))
 
     def update_carrot_data(self):
         self.carrot_highlight_words()
