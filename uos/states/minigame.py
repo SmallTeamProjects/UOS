@@ -29,7 +29,6 @@ class MinigameBase(UOS.State):
         self.text_width = UOS.text.width(' ')
         self.carrot = Carrot()
 
-        self.header = 'temp header'
         self.hex_seed = 0
         self.attempts = attempts
         self.difficulty = 5
@@ -50,6 +49,7 @@ class MinigameBase(UOS.State):
         pass
 
     def carrot_highlight_words(self):
+        self.carrot.type = ''
         position = None
         boolean_good = False
         line = self.carrot.line + (self.carrot.block - 1) * 16
@@ -57,11 +57,13 @@ class MinigameBase(UOS.State):
             for pline, p in zip(pos['line'], pos['pos']):
                 if pline == line:
                     if pos['type'] == 'words':
+                        self.carrot.type = 'words'
                         if p[0] <= self.carrot.pos < p[1]:
                             position = pos
                             boolean_good = True
                             break
                     elif pos['type'] == 'brackets':
+                        self.carrot.type = 'brackets'
                         if p[0] == self.carrot.pos or p[1] - 1 == self.carrot.pos:
                             position = pos
                             boolean_good = True
@@ -70,7 +72,7 @@ class MinigameBase(UOS.State):
             if boolean_good:
                 break
 
-        self.carrot.text = ""
+        self.carrot.text = ''
         self.carrot.hposition = position
         if position:
             self.highlight_images = []
@@ -103,7 +105,7 @@ class MinigameBase(UOS.State):
         self.tab_rect.centerx = self.state.machine.rect.centerx
 
     def display_string(self):
-        self.writer.add(0, self.header)
+        self.writer.add(0, UOS.settings.header)
         self.writer.add(0, "Password Required")
         self.writer.add(0, self.attempts_remaining(self.attempts))
         self.generate_outline(1, self.hex_seed, 16)
@@ -150,7 +152,9 @@ class MinigameBase(UOS.State):
 
                 elif event.key == pygame.K_RETURN:
                     UOS.sounds.play('password', 'attempt')
-                    self.get_likeness(self.secret_word) # temporary should input highlighted word
+                    self.get_likeness(self.carrot.text)
+                    print(self.carrot.type)
+
                     # todo get selected word
 
                 elif event.key == pygame.K_TAB:
@@ -280,23 +284,6 @@ class MinigameBase(UOS.State):
                 update_after = (20, 7, self.display_buffer[x + i]))
             hex_num += 12
 
-    # gets character likeness
-    def get_likeness(self, word):
-        likeness = 0
-        for enum, letter in enumerate(self.secret_word):
-            if word[enum] == letter:
-                likeness += 1
-
-        if likeness == len(self.secret_word):
-            UOS.sounds.play('password', 'good')
-            # todo pass valid logon
-        else:
-            UOS.sounds.play('password', 'bad')
-            self.writer.add(3, '> Entry denied.')
-            self.writer.add(3, '> Likeness=' + likeness)
-            self.attempts -= 1
-            # todo if 0 attempts lock
-
     # highlight bracket sets
     def get_bracket_sets(self):
         openers = '([{<'
@@ -319,6 +306,32 @@ class MinigameBase(UOS.State):
                         sets.append((start_index + n, end_index + n + 1))
         return self.generate_highlight_positions(sets, 'brackets')
 
+    # gets character likeness
+    def get_likeness(self, word):
+        likeness = 0
+        if self.carrot.type is 'words' and word is not '':
+            for enum, letter in enumerate(self.secret_word):
+                if word[enum] == letter:
+                    likeness += 1
+
+        if self.carrot.type is 'words' and likeness == len(self.secret_word):
+            UOS.sounds.play('password', 'good')
+            # todo pass valid logon
+        elif self.carrot.type is 'words' and word is not '':
+            UOS.sounds.play('password', 'bad')
+            self.writer.add(3, '> ' + word)
+            self.writer.add(3, '> Entry denied.')
+            self.writer.add(3, '> Likeness=' + str(likeness))
+            self.attempts -= 1
+            # todo if 0 attempts lock
+        elif self.carrot.type is 'brackets':
+            self.hack()
+        else:
+            UOS.sounds.play('password', 'bad')
+            self.writer.add(3, '> Error.')
+
+    # returns word from highlight_position
+
     # runs bracket functions
     def hack(self):
         roll = randint(0,4)
@@ -330,7 +343,8 @@ class MinigameBase(UOS.State):
 
     # removes dud
     def remove_dud(self):
-        UOS.sounds.play('dud')
+        UOS.sounds.play('password', 'dud')
+        self.writer.add(3, '> Dud Removed.')
 
     def render(self, surface):
         if self.writer.is_finish() and not self.carrot.init:
@@ -355,6 +369,8 @@ class MinigameBase(UOS.State):
 
     # sets attempts back to 4
     def reset_tries(self):
+        UOS.sounds.play('password', 'attempt')
+        self.writer.add(3, '> Tries Reset.')
         self.attempts = 4
 
     def update_carrot_data(self):
