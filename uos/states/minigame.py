@@ -202,57 +202,34 @@ class MinigameBase(UOS.State):
 
     # creates the full grid by filling remaining space with junk
     def generate_display(self):
-        self.display_buffer = ''
+        # remove . from punctuation
+        punctuation = string.punctuation
+        punctuation = punctuation[:13] + punctuation[14:]
+        # fill display buffer with junk
+        self.display_buffer = [choice(punctuation) for i in range(self.characters)]
         self.hex_seed = randint(4096, 65535)
         word_count = randint(self.difficulty // 2 + 3, self.difficulty + self.difficulty // 2)
         self.secret_word = get_random_word(self.difficulty)
         random_words = get_words(self.difficulty, self.secret_word, word_count)
-        length = self.characters - self.difficulty - 1
-        low = length // word_count // 2
+
         junk = SimpleNamespace(
-            low = low,
-            mid = int(length // word_count // 1.5),
-            high = length // word_count,
-            count = low + 1,
-            word = 0,
-            offset = 0,
-            value = int((length // word_count - low) * 0.3)
+            low = 0.0,
+            high = self.characters / (word_count + 1),
+            value = self.characters / (word_count + 1)
         )
 
-        # remove . from punctuation
         hposition = []
-        punctuation = string.punctuation
-        punctuation = punctuation[:13] + punctuation[14:]
+        # insert words and store highlight position
+        for word in random_words:
+            # don't let words touch
+            x = randint(int(junk.low) + 1, int(junk.high) - self.difficulty)
+            self.display_buffer[x: x + self.difficulty] = list(word)
+            hposition.append((x, x + self.difficulty))
+            junk.low += junk.value
+            junk.high += junk.value
 
-        x = 0
-        while x < self.characters:
-            boolean_good = False
-            if junk.word < word_count:
-                if junk.count > junk.low + junk.offset and randint(0, 25) == 0:
-                    junk.offset += junk.value
-                    boolean_good = True
-                elif junk.count > junk.mid + junk.offset and randint(0, 5) == 0:
-                    junk.offset += junk.value // 2
-                    boolean_good = True
-                elif junk.count > junk.high:
-                    value = junk.value // 4
-                    if value > 0:
-                        junk.offset -= value
-                    else:
-                        junk.offset -= 1
-                    boolean_good = True
-
-            if boolean_good:
-                self.display_buffer += random_words[junk.word]
-                hposition.append((x, x + self.difficulty))
-                x += self.difficulty
-                junk.word += 1
-                junk.count = 0
-            else:
-                self.display_buffer += choice(punctuation)
-                junk.count += 1
-                x += 1
-
+        # covert display buffer to string
+        self.display_buffer = ''.join(self.display_buffer)
         # split into lines
         self.display_buffer = [self.display_buffer[i:i + 12] for i in range(0, self.characters, 12)]
         self.highlight_position = self.generate_highlight_positions(hposition, 'words')
