@@ -17,12 +17,13 @@ class MinigameBase(UOS.State):
         w = self.state.machine.rect.w
         self.top_height = h * 4 - 4
         bottom_height = h * 16
+        b1, b2 = self.block_position = 8, 188
         # header
         self.writer.add_output(pygame.Rect(8, 8, w, h * 3))
         # body1
-        self.writer.add_output(pygame.Rect(8, self.top_height, 186, bottom_height))
+        self.writer.add_output(pygame.Rect(b1, self.top_height, 186, bottom_height))
         # body2
-        self.writer.add_output(pygame.Rect(188, self.top_height, 186, bottom_height))
+        self.writer.add_output(pygame.Rect(b2, self.top_height, 186, bottom_height))
         # body3
         self.writer.add_input(pygame.Rect(364, self.top_height, 140, bottom_height), True, 0, True)
         # configuration variables
@@ -76,12 +77,17 @@ class MinigameBase(UOS.State):
         self.carrot.hposition = position
         if position:
             self.highlight_images = []
-            x = self.writer.blocks[self.carrot.block].rect.left - 8
-            y = self.writer.blocks[self.carrot.block].rect.top
+            y = self.top_height
             for pline, p in zip(position['line'], position['pos']):
                 text = self.display_buffer[pline][p[0]:p[1]]
                 self.carrot.text += text
-                pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline % 16) + y
+                if pline < 16:
+                    x = self.block_position[0] - 8
+                    pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * pline + y
+                else:
+                    x = self.block_position[1] - 8
+                    pos = self.text_width * (p[0] + 8) + x, UOS.text.get_linesize() * (pline - 16) + y
+
                 self.highlight_images.append((UOS.text(text, (0,0,0), UOS.color.color), pos))
         else:
             self.highlight_images = None
@@ -271,7 +277,6 @@ class MinigameBase(UOS.State):
             else:
                 p1 = p[0], 12
                 p2 = 0, p[1]
-                # (line number, position), (line number, position)
                 highlight_position.append({'line':(dx,dy), 'pos':(p1,p2), 'type':type})
 
         return highlight_position
