@@ -73,9 +73,12 @@ class WriterText:
             if isinstance(self.interval, tuple):
                 if self.interval_change:
                     if self.interval_pos < len(self.interval_change):
-                        if self.interval_change[self.interval_pos] == self.pos:
+                        if self.pos > self.interval_change[self.interval_pos]:
+                            self.pos = self.interval_change[self.interval_pos]
+
+                        if self.interval_change[self.interval_pos] <= self.pos:
                             self.interval_pos += 1
-                            if len(self.interval_change) > self.interval_pos:
+                            if len(self.interval_change) >= self.interval_pos:
                                 timer.interval = self.interval[self.interval_pos]
         elif not self.is_finish():
             if self.insert_after and not self.insert_finish:
