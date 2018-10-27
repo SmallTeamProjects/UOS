@@ -15,7 +15,6 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
             'RENAME USER': self.command_rename_user,
             'RUN FILE': self.command_run_file,
             'RUN ?': self.command_run_help,
-            'SET COLOR': self.command_set_color,
             'SET DIR/PROTECTION-OWNER': self.command_set_dir_protection_owner,
             'SET DIR/PROTECTION-PASSWORD': self.command_set_dir_protection_password,
             'SET FILE/PROTECTION-OWNER': self.command_set_file_protection_owner,
@@ -178,8 +177,6 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
         if color in UOS.color.COLORS:
             UOS.settings.color = color
             UOS.save_settings()
-            UOS.user.current.color = color
-            UOS.user.save()
             UOS.color.change_color(color)
         else:
             self.writer_add("Invalid color")

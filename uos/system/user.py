@@ -11,7 +11,7 @@ class UOS_User:
         self.current = None
         self.accounts = {}
         self._hex = '0x5a0'
-        self.menu_version = "0.1.1"
+        self.menu_version = "0.1.2"
 
         self.has_any = False
         self.has_admin = False
@@ -90,7 +90,6 @@ class UOS_User:
             password = password,
             root = root,
             group = group,
-            color = 'green',
             menu = self.default_menu(),
             menu_version = self.menu_version)
 
@@ -130,13 +129,11 @@ class UOS_User:
         if name in self.accounts:
             self.current = self.accounts[name]
             self.paths.current = self.rootpath()
-            if self.bus.uos.color.key != self.current.color:
-                self.bus.uos.color.change_color(self.current.color)
 
             # will be remove later
             if vars(self.current).get('menu_version', "") != self.menu_version:
                 self.current.menu_version = self.menu_version
-                self.current.menu.update(self.default_menu())
+                del self.current.color
                 self.save()
         else:
             self.current = None
