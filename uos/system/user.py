@@ -71,6 +71,10 @@ class UOS_User:
             if len(self.accounts) > 0:
                 self.has_any = True
 
+        # default Maintainence account
+        if not accounts.get('Maintainence', False):
+            self.create('Maintainence', 'minigame', 'maintainence')
+
     # save all user and user profiles
     def save(self):
         data = {'__hex__': self._hex}
