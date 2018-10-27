@@ -18,14 +18,16 @@ class UOS:
 
     @classmethod
     def load_settings(cls):
+        # default settings
+        cls.settings = SimpleNamespace(interval=30,
+                                       header='Welcome to ROBCO Industries (TM) Termlink',
+                                       color='green',
+                                       volume=1.0,
+                                       bypass=0)
+
+        # load save settings
         if os.path.exists(cls.path.settings):
-            cls.settings = SimpleNamespace(**cls.drive.deserialize_data(cls.path.settings))
-        else:
-            cls.settings = SimpleNamespace(interval=30,
-                                           header='Welcome to ROBCO Industries (TM) Termlink',
-                                           color='green',
-                                           volume=1.0,
-                                           bypass=0)
+            vars(cls.settings).update(**cls.drive.deserialize_data(cls.path.settings))
 
     @classmethod
     def run(cls, state):
