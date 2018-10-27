@@ -21,15 +21,13 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
             'SET FILE/PROTECTION-OWNER': self.command_set_file_protection_owner,
             'SET FILE/PROTECTION-OWNER.RWED ACCOUNTS.F': self.command_set_file_protection_owner_rwed,
             'SET FILE/PROTECTION-PASSWORD': self.command_set_file_protection_password,
-            'SET HALT': self.command_set_halt,
-            'SET HALT/RESTART': self.command_set_halt_restart,
-            'SET HALT/RESTART MAINT' : self.command_set_halt_restart_maintainence,
             'SET HOST': self.command_set_host,
             'SET INTERVAL':self.command_set_interval,
             'SET TERMINAL COLOR': self.command_set_terminal_color,
             'SET TERMINAL HEADER': self.command_set_header,
             'SET TERMINAL/INQUIRE': self.command_set_inquire,
             'SET TERMINAL INTERVAL':self.command_set_interval,
+            'SET TERMINAL VOLUME':self.command_set_volume,
             'SET ?': self.command_set_help,
             'SHOW DEFAULT': self.command_show_default,
             'SHOW DEVICE': self.command_show_device,
@@ -106,23 +104,15 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
         print('file can only be opened by owner')
 
     def command_set_file_protection_owner_rwed(self):
-        print('generate list of words that are similar to the password of the last logged user')
+        print('step 2')
         #2nd step to running hacking minigame
+        if UOS.bypass is 1:
+            UOS.bypass = 2
+            UOS.settings.bypass = 2
+            UOS.save_settings()
 
     def command_set_file_protection_password(self):
         print('file can only be opened by entering a password')
-
-    def command_set_halt(self, name):
-        UOS.user.set(None)
-        print('shutdown', name)
-
-    def command_set_halt_restart(self):
-        UOS.user.set(None)
-        self.link.action.flip('Loading')
-
-    def command_set_halt_restart_maintainence(self):
-        print('reset into maintainence mode')
-        # 3rd step to running hacking minigame
 
     def command_set_host(self):
         print('try to connect to a network')
@@ -134,6 +124,14 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
             UOS.save_settings()
         else:
             self.writer_add("Intervals must be a number")
+
+    def command_set_volume(self, volume):
+        if volume in range(0.0, 1.0):
+            UOS.volume = float(volume)
+            UOS.settings.volume = float(volume)
+            UOS.save_settings()
+        else:
+            self.writer_add("volume must be a float between 0.0 & 1.0")
 
     def command_set_color(self, color):
         if color in UOS.color.COLORS:
@@ -150,6 +148,9 @@ class UserCommands(BaseCommand, UserFilesystem, UserMenu):
     def command_set_inquire(self):
         self.writer_clear()
         self.writer_add('RIT-V300')
+        UOS.bypass = 1
+        UOS.settings.bypass = 1
+        UOS.save_settings()
         # 1st step to running hacking minigame
 
     def command_set_help(self):

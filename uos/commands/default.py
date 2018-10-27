@@ -9,8 +9,11 @@ class DefaultCommands(BaseCommand):
             'CLEAR': self.command_clear,
             'LOGON': self.command_logon,
             'LOGON ?': self.command_logon_help,
+            'SET HALT': self.command_set_halt,
+            'SET HALT/RESTART': self.command_set_halt_restart,
+            'SET HALT/RESTART MAINT': self.command_set_halt_restart_maintainence,
             'SHOW TIME': self.command_show_time,
-            'MINIGAME': self.command_minigame,
+            'MINIGAME': self.command_minigame
             }
         elif UOS.user.has_any:
             self.command_list = {
@@ -18,13 +21,19 @@ class DefaultCommands(BaseCommand):
             'LOGON': self.command_logon,
             'LOGON ?': self.command_logon_help,
             'SETUP': self.command_setup,
+            'SET HALT': self.command_set_halt,
+            'SET HALT/RESTART': self.command_set_halt_restart,
+            'SET HALT/RESTART MAINT': self.command_set_halt_restart_maintainence,
             'SHOW TIME': self.command_show_time,
-            'MINIGAME': self.command_minigame,
+            'MINIGAME': self.command_minigame
             }
         else:
             self.command_list = {
             'CLEAR': self.command_clear,
             'SETUP': self.command_setup,
+            'SET HALT': self.command_set_halt,
+            'SET HALT/RESTART': self.command_set_halt_restart,
+            'SET HALT/RESTART MAINT': self.command_set_halt_restart_maintainence,
             'SHOW TIME': self.command_show_time,
             'MINIGAME': self.command_minigame,
             }
@@ -107,6 +116,22 @@ class DefaultCommands(BaseCommand):
             self.writer_clear()
             self.writer_add('Password minium of 4 characters')
             self.writer_add('Enter {0} password.'.format(self.info.name), protect=True)
+
+    def command_set_halt(self, name):
+        UOS.user.set(None)
+        print('shutdown', name)
+
+    def command_set_halt_restart(self):
+        UOS.user.set(None)
+        self.link.action.flip('Loading')
+
+    def command_set_halt_restart_maintainence(self):
+        print('reset into maintainence mode')
+        # 3rd step to running hacking minigame
+        if UOS.bypass is 2:
+            UOS.bypass = 3
+            UOS.settings.bypass = 3
+            UOS.save_settings()
 
     def command_show_time(self):
         self.writer_clear()

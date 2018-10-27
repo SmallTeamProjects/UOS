@@ -254,9 +254,9 @@ def get_words(key, secret_word, word_count):
                     likeness += 1
             if word not in word_list and likeness >= target_likeness or count > 100:  # important to avoid infinite loop
                 word_list.append(word)
-                print('likeness:' + str(likeness))
-                print('target likeness:' + str(target_likeness))
-                print('count:' + str(count))
+                # print('likeness:' + str(likeness))
+                # print('target likeness:' + str(target_likeness))
+                # print('count:' + str(count))
                 found = True
             count += 1
         shuffle(word_list)

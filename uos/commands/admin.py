@@ -34,7 +34,7 @@ class AdminCommands(BaseCommand):
             self.link.state = None
         else:
             self.writer_clear()
-            self.writer_add('Password minium of 4 characters')
+            self.writer_add('Password minimum of 4 characters')
             self.writer_add('Enter {0} password.'.format(self.info.name), protect=True)
 
     def command_delete_user(self, username):
@@ -52,6 +52,11 @@ class AdminCommands(BaseCommand):
     def command_run_debug_accounts(self):
         print('run hacking minigame if previous steps completed')
         #Last step to running hacking minigame
+        if UOS.bypass is 3:
+            self.link.action.flip('Minigame')
+            UOS.bypass = 0
+            UOS.settings.bypass = 0
+            UOS.save_settings()
 
     def command_set_default(self):
         print('set default directory')

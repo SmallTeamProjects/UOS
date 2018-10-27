@@ -159,7 +159,7 @@ class MinigameBase(UOS.State):
                 elif event.key == pygame.K_RETURN:
                     UOS.sounds.play('password', 'attempt')
                     self.get_likeness(self.carrot.text)
-                    print(self.carrot.type)
+                    # print(self.carrot.type)
 
                     # todo get selected word
 
@@ -236,7 +236,7 @@ class MinigameBase(UOS.State):
         self.highlight_position.extend(self.get_bracket_sets())
 
     def generate_highlight_positions(self, hposition, type):
-        print(hposition)
+        # print(hposition)
         highlight_position = []
         self.highlight_images = None
         for position in hposition:

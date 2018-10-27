@@ -8,6 +8,8 @@ class UOS:
     State = UOS_State
     color = UOS_Color()
     interval = 30
+    volume = 1.0
+    bypass = 0
     idle = False
 
     @classmethod
@@ -21,7 +23,9 @@ class UOS:
         else:
             cls.settings = SimpleNamespace(interval=30,
                                            header='Welcome to ROBCO Industries (TM) Termlink',
-                                           color='green')
+                                           color='green',
+                                           volume=1.0,
+                                           bypass=0)
 
     @classmethod
     def run(cls, state):
@@ -39,9 +43,12 @@ class UOS:
         cls.load_settings()
         cls.interval = cls.settings.interval
         cls.color.setup(cls.settings.color)
+        cls.volume = cls.settings.volume
+        cls.bypass = cls.settings.bypass
         TickTimerData.setup(cls.get_interval)
         cls.data = UOS_Data()
         cls.sounds = UOS_Sounds()
+
         cls.user = UOS_User(cls.bus)
         cls.text = UOS_Text(cls.color)
 
