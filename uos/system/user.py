@@ -133,7 +133,8 @@ class UOS_User:
             # will be remove later
             if vars(self.current).get('menu_version', "") != self.menu_version:
                 self.current.menu_version = self.menu_version
-                del self.current.color
+                if vars(self.current).get('color', False):
+                    del self.current.color
                 self.save()
         else:
             self.current = None
