@@ -19,8 +19,7 @@ class Terminal(UOS.State):
         else:
             for item in UOS.data.intro:
                 self.writer.add_input(self.state.machine.rect.inflate(-20, -20))
-                self.writer.add(0, item.text, item.interval,
-                                item.sound, newline=item.newline,
+                self.writer.add(0, item.text, item.interval, item.sound,
                                 insert_after=item.insert_after,
                                 update_after=item.update_after)
 

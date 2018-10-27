@@ -17,13 +17,11 @@ class OutputBlock:
     def add(self, text,
             interval=-1,
             sound_keys=['typing multiple'],
-            newline=True,
             invisible=False,
             insert_after=None,
             update_after=None):
 
-        self.writer.add(text, interval, sound_keys, newline, invisible,
-                        insert_after, update_after)
+        self.writer.add(text, interval, sound_keys, invisible, insert_after, update_after)
 
     def add_empty(self, count=1):
         for c in range(count):
@@ -71,7 +69,6 @@ class InputBlock(OutputBlock):
             interval=-1,
             sound_keys=['typing multiple'],
             protect=False,
-            newline=True,
             invisible=False,
             insert_after=None,
             update_after=None):
@@ -79,7 +76,7 @@ class InputBlock(OutputBlock):
         if protect:
             self.text_line.text.state.append(WriterText.State.invisible)
 
-        OutputBlock.add(self, text, interval, sound_keys, newline, invisible,
+        OutputBlock.add(self, text, interval, sound_keys, invisible,
                         insert_after, update_after)
 
     def color_change(self):

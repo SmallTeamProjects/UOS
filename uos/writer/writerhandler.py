@@ -52,21 +52,16 @@ class WriterHandler:
                     self.update = False
                     self.current = None
 
-    def newline(self):
-        if self.current and self.current != 'update':
-            return self.current.newline
-        return True
+    #def newline(self):
+        #if self.current and self.current != 'update':
 
     def render(self, surface, position, linesize, left):
         if self.current:
             if not self.update:
                 self.current.render(surface, position)
 
-            if self.current.newline:
-                position[0] = left
-                position[1] += linesize
-            else:
-                position[0] += self.current.image.get_rect().w
+            position[0] = left
+            position[1] += linesize
 
             if self.update:
                 if self.current.update_finish:

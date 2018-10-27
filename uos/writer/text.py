@@ -17,7 +17,6 @@ class WriterText:
     def __init__(self, text,
                  interval=0,
                  sound_keys=['typing multiple'],
-                 newline=True,
                  state=[],
                  insert_after = None,
                  update_after = None):
@@ -33,7 +32,6 @@ class WriterText:
         self.image = None
         self.state = state
         self.updated = False
-        self.newline = newline
         self.buffer = list(text)
         self.interval = interval
         self.interval_pos = 0
@@ -115,7 +113,6 @@ class WriterText:
     def get_settings(self):
         return {'interval': self.interval,
                 'sound_keys': self.sound_keys,
-                'newline': self.newline,
                 'state': self.state}
 
     def get_size(self, slice=-1):

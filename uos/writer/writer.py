@@ -13,7 +13,6 @@ class Writer:
     #   interval=-1,
     #   sound_keys=['typing multiple'],
     #   protect=False, # only for InputBlock
-    #   newline=True,
     #   invisible=False)
     def add(self, index, *args, **kwarg):
         self.blocks[index].add(*args, **kwarg)

@@ -98,7 +98,7 @@ class InputLine:
         pass
 
     def new_text(self):
-        self.text = WriterText('', 0, None, True, [WriterText.State.append])
+        self.text = WriterText('', 0, None, [WriterText.State.append])
 
     def update_line(self):
         pass

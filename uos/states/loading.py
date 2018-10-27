@@ -9,8 +9,7 @@ class Loading(UOS.State):
         self.writer.add_output(self.state.machine.rect.inflate(-16, -16))
         self.time_next = 800
         for item in UOS.data.loading:
-            self.writer.add(0, item.text, item.interval,
-                            item.sound, item.newline,
+            self.writer.add(0, item.text, item.interval, item.sound,
                             insert_after=item.insert_after,
                             update_after=item.update_after)
 

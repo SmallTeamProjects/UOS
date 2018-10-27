@@ -2,13 +2,11 @@ class Data:
     def __init__(self, text,
                  interval = -1,
                  sound = ['typing multiple'],
-                 newline = True,
                  insert_after = None,
                  update_after = None):
 
         self.text = text
         self.sound = sound
-        self.newline = newline
         self.interval = interval
         self.insert_after = insert_after
         self.update_after = update_after

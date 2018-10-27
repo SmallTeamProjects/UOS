@@ -84,4 +84,4 @@ class TextLine(InputLine):
 
     def new_text(self):
         self.text = WriterText(''.join(self.carrot.carrot), 0,
-            None, True, [WriterText.State.append])
+            None, [WriterText.State.append])

@@ -13,9 +13,8 @@ class BufferBox:
         else:
             self.items.append(item)
 
-        length, offset = self.get_buffer_length()
-        if length > self.max_lines:
-            self.items = self.items[-(self.max_lines + offset):]
+        if len(self.items) > self.max_lines:
+            self.items = self.items[-self.max_lines:]
 
         self.update_position()
 
@@ -23,9 +22,9 @@ class BufferBox:
         self.position = self.rect.topleft
         self.items = []
 
-    def get_buffer_length(self):
-        length = sum([1 for item in self.items if item is None or item.newline])
-        return length, len(self.items) - length
+    #def get_buffer_length(self):
+        #length = sum([1 for item in self.items if item is None])
+        #return length, len(self.items) - length
 
     def pop(self):
         items = self.items
@@ -57,17 +56,14 @@ class BufferBox:
                 if item.image:
                     x += item.image.get_rect().width
 
-                if item.newline:
-                    x = self.rect.left
-                    if not self.reverse:
-                        rect.top = y
-                        y += self.linesize
-                        item.rect = rect
-                    else:
-                        y -= self.linesize
-                        rect.bottom = y
-                        item.rect = rect
+                x = self.rect.left
+                if not self.reverse:
+                    rect.top = y
+                    y += self.linesize
+                    item.rect = rect
                 else:
+                    y -= self.linesize
+                    rect.bottom = y
                     item.rect = rect
             else:
                 if self.reverse:

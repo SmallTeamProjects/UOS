@@ -11,8 +11,7 @@ class WriterBuffer:
         self.timer = timer
         self.rect = rect
 
-    def add(self, text, interval, sound_keys, newline, invisible,
-            insert_after, update_after):
+    def add(self, text, interval, sound_keys, invisible, insert_after, update_after):
         states = []
         if invisible:
             states.append(WriterText.State.invisible)
@@ -26,11 +25,11 @@ class WriterBuffer:
             text = self.wordwrap(text)
 
         if isinstance(text, (tuple, list)):
-            self.handler.add(*[WriterText(t, interval, sound_keys, newline,
-                             states, insert_after, update_after) for t in text])
+            self.handler.add(*[WriterText(t, interval, sound_keys, states,
+                             insert_after, update_after) for t in text])
         else:
-            self.handler.add(WriterText(text, interval, sound_keys, newline,
-                             states, insert_after, update_after))
+            self.handler.add(WriterText(text, interval, sound_keys, states,
+                             insert_after, update_after))
 
     def append(self, item):
         self.bufferbox.add(item)
