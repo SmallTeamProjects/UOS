@@ -32,9 +32,6 @@ class BaseCommand:
         self.info.group = None
         self.info.filepath = None
 
-    def get_command(self, command):
-        return getattr(self, command)
-
     def writer_add(self, text, *args, **kwargs):
         if args == () and 'interval' not in kwargs.keys():
             args = self.link.interval,

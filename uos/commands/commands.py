@@ -28,7 +28,7 @@ class Command:
             for command in [cmd for cmd in dir(commands) if cmd.startswith('command_')]:
                 # build the commands
                 c = command[8:].replace('_', ' ').upper()
-                self.command_call[c] = commands.get_command(command)
+                self.command_call[c] = getattr(commands, command)
 
         self.command_keys = sorted(self.command_call.keys(), reverse=True)
 
