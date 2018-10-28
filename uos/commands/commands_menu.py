@@ -1,20 +1,18 @@
+from .basecommand import BaseCommand
 from ..uos import UOS
 
 
-class UserMenu:
-    def user_menu_commands(self):
-        return {
-            'MENU': self.command_menu,
-            'MENU ADD': self.command_menu_add,
-            'MENU EDIT': self.command_menu_edit,
-            'MENU REMOVE': self.command_menu_remove,
-            'MENU RESET': self.command_menu_reset
-        }
-
+class MenuCommands(BaseCommand):
     def command_menu(self):
+        if not self.clearance(1):
+            return
+
         self.link.action.flip('MenuMenu')
 
     def command_menu_add(self, menu_name, index, *args):
+        if not self.clearance(1):
+            return
+
         if index.isdigit():
             index = int(index)
         else:
@@ -109,6 +107,9 @@ class UserMenu:
             self.writer_add(menu_name + " item can not be added")
 
     def command_menu_edit(self, menu_name, index, action, *args):
+        if not self.clearance(1):
+            return
+
         default = list(UOS.user.default_menu().keys())
         default.remove('MainMenu')
         if index.isdigit():
@@ -136,6 +137,9 @@ class UserMenu:
             self.writer_add(menu_name + " item can not be altered")
 
     def command_menu_remove(self, menu_name, index):
+        if not self.clearance(1):
+            return
+
         default = list(UOS.user.default_menu().keys())
         default.remove('MainMenu')
         if index.isdigit():
@@ -155,6 +159,9 @@ class UserMenu:
             self.writer_add(menu_name + " item can not be removed")
 
     def command_menu_reset(self):
+        if not self.clearance(1):
+            return
+            
         UOS.user.current.menu = UOS.user.default_menu()
         self.writer_add("Menu has been reset to default")
         UOS.user.save()

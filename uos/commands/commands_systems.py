@@ -1,55 +1,13 @@
-import time
 from .basecommand import BaseCommand
 from ..uos import UOS
 
-class DefaultCommands(BaseCommand):
-    def __init__(self, link):
-        if UOS.user.has_admin:
-            self.command_list = {
-            'CLEAR': self.command_clear,
-            'LOGON': self.command_logon,
-            'LOGON ?': self.command_logon_help,
-            'SET HALT': self.command_set_halt,
-            'SET HALT/RESTART': self.command_set_halt_restart,
-            'SET HALT/RESTART MAINT': self.command_set_halt_restart_maintainence,
-            'SHOW TIME': self.command_show_time,
-            'MINIGAME': self.command_minigame
-            }
-        elif UOS.user.has_any:
-            self.command_list = {
-            'CLEAR': self.command_clear,
-            'LOGON': self.command_logon,
-            'LOGON ?': self.command_logon_help,
-            'SETUP': self.command_setup,
-            'SET HALT': self.command_set_halt,
-            'SET HALT/RESTART': self.command_set_halt_restart,
-            'SET HALT/RESTART MAINT': self.command_set_halt_restart_maintainence,
-            'SHOW TIME': self.command_show_time,
-            'MINIGAME': self.command_minigame
-            }
-        else:
-            self.command_list = {
-            'CLEAR': self.command_clear,
-            'SETUP': self.command_setup,
-            'SET HALT': self.command_set_halt,
-            'SET HALT/RESTART': self.command_set_halt_restart,
-            'SET HALT/RESTART MAINT': self.command_set_halt_restart_maintainence,
-            'SHOW TIME': self.command_show_time,
-            'MINIGAME': self.command_minigame,
-            }
 
-        #testing commands
-        self.command_list['SYSTEM MESSAGE'] = self.command_system_message
-        BaseCommand.__init__(self, link)
+class SystemCommands(BaseCommand):
+    def command_exit(self):
+        if not self.clearance(1):
+            return
 
-    def update_commands(self):
-        del self.command_list['SETUP']
-        self.command_list['LOGON'] = self.command_logon
-        self.command_list['LOGON ?'] = self.command_logon_help
-        self.keys = sorted(self.command_list.keys(), reverse=True)
-
-    def command_clear(self):
-        self.writer_clear()
+        print('terminate a script')
 
     def command_logon(self, name):
         if not UOS.user.name:
@@ -57,13 +15,13 @@ class DefaultCommands(BaseCommand):
                 self.writer_add('Enter Password:', protect=True)
                 self.info.name = name
                 self.info.attempts = 3
-                self.link.state = self.command_logon_password
+                self.link.state = self.logon_password
             else:
                 self.writer_add('Invalid User !')
         else:
             self.writer_add('Error: Requires Logout')
 
-    def command_logon_password(self, password):
+    def logon_password(self, password):
         if UOS.user.accounts[self.info.name].password == password:
             UOS.user.set(self.info.name)
             self.writer_add('Welcome {0}'.format(self.info.name))
@@ -87,22 +45,45 @@ class DefaultCommands(BaseCommand):
                      "     USERNAME",
                      "LOGON ?"])
 
-    def command_setup(self):
-        self.writer_clear()
-        self.link.state = self.command_setup_new_admin
-        self.writer_add('Enter admin name.')
+    def command_logoff(self):
+        if not self.clearance(1):
+            return
 
-    def command_setup_new_admin(self, name):
+        self.writer_clear()
+        self.writer_add( ["...Checking Clearance..........",
+                          "...AUTHORIZED.................",
+                          "...Locking Mechanism Enable..."] )
+        UOS.user.set(None)
+
+    def command_logoff_help(self):
+        if not self.clearance(1):
+            return
+
+        self.writer_clear()
+        self.writer_add( ["USAGE:",
+                          "LOGOFF",
+                          "     USERNAME",
+                          "LOGOFF ?"] )
+
+    def command_setup(self):
+        if not UOS.user.has_admin:
+            self.writer_clear()
+            self.link.state = self.setup_new_admin
+            self.writer_add('Enter admin name.')
+        else:
+            self.writer_add('Invalid command')
+
+    def setup_new_admin(self, name):
         if len(name) > 2:
             self.info.name = name
-            self.link.state = self.command_setup_password
+            self.link.state = self.setup_password
             self.writer_add('Enter {0} password.'.format(self.info.name), protect=True)
         else:
             self.writer_clear()
             self.writer_add('Admin name needs to more the 2 characters')
             self.writer_add('Enter admin name.')
 
-    def command_setup_password(self, password):
+    def setup_password(self, password):
         if len(password) > 3:
             UOS.user.create(self.info.name, password, 'admin')
             self.writer_add('New admin {0} has been created.'.format(self.info.name))
@@ -132,13 +113,3 @@ class DefaultCommands(BaseCommand):
             UOS.bypass = 3
             UOS.settings.bypass = 3
             UOS.save_settings()
-
-    def command_show_time(self):
-        self.writer_clear()
-        self.writer_add(str(time.ctime()))
-
-    def command_system_message(self):
-        pass
-
-    def command_minigame(self):
-        self.link.action.flip('Minigame')

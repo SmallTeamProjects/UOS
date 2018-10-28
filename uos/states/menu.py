@@ -2,7 +2,6 @@ import pygame
 from types import SimpleNamespace
 from ..uos import UOS
 from ..writer import Writer
-from ..commands import Command
 
 class MenuBase:
     def __init__(self, parent, position=0, name=None):
@@ -60,7 +59,7 @@ class MenuNested:
     def call_command(self):
         self.name = self.get_name()
         self.parent.writer.get_line(1, self.position).set_text(self.name)
-        Command.call(self.parent, self.get_item()[2], True)
+        UOS.command(self.parent, self.get_item()[2], True)
 
 class MenuSelection(MenuBase):
     def __init__(self, parent, position, name, command):
@@ -69,7 +68,7 @@ class MenuSelection(MenuBase):
 
     def call_right(self):
         pass
-        #Command.call(self.parent, self.command, True)
+        #UOS.command(self.parent, self.command, True)
 
 class MenuText(MenuBase):
     def __init__(self, parent, position, name, info):
@@ -88,7 +87,7 @@ class MenuText(MenuBase):
                 if item[0] == '-t':
                     self.name += "  " + item[1]
                 elif item[0] == '-c':
-                    Command.call(self, item[1])
+                    UOS.command(self, item[1])
                     self.name += " " + self.text
             else:
                 self.name += " Menu Error"

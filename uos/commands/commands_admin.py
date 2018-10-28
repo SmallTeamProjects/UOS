@@ -1,22 +1,11 @@
 from .basecommand import BaseCommand
 from ..uos import UOS
 
-# for both maintainence and admin
 class AdminCommands(BaseCommand):
-    def __init__(self, link):
-
-        self.command_list = {
-            'CREATE USER': self.command_create_user,
-            'DELETE USER': self.command_delete_user,
-            'RUN DEBUG': self.command_run_debug,
-            'RUN DEBUG/ACCOUNTS.F': self.command_run_debug_accounts,
-            'SET DEFAULT': self.command_set_default,
-            'SHOW USERS': self.command_show_users,
-        }
-
-        BaseCommand.__init__(self, link)
-
     def command_create_user(self, name, group):
+        if not self.clearance(2):
+            return
+
         if group in ['-a', '-u', '-m']:
             group = {'-a':'admin', '-u':'user', '-m':'maintainence'}[group]
 
@@ -26,6 +15,9 @@ class AdminCommands(BaseCommand):
         self.writer_add('Enter {0} password.'.format(self.info.name), protect=True)
 
     def command_create_user_password(self, password):
+        if not self.clearance(2):
+            return
+
         if len(password) > 3:
             UOS.user.create(self.info.name, password, self.info.group)
             self.writer_add('User {0} has been added'.format(self.info.name))
@@ -38,6 +30,9 @@ class AdminCommands(BaseCommand):
             self.writer_add('Enter {0} password.'.format(self.info.name), protect=True)
 
     def command_delete_user(self, username):
+        if not self.clearance(2):
+            return
+
         if UOS.user.current.group == 'admin':
             if UOS.user.remove(username):
                 self.writer_add('{0} has been removed'.format(username))
@@ -47,9 +42,15 @@ class AdminCommands(BaseCommand):
             self.writer_add('Only admin can delete users')
 
     def command_run_debug(self):
+        if not self.clearance(2):
+            return
+
         print('run diagnostic test')
 
     def command_run_debug_accounts(self):
+        if not self.clearance(2):
+            return
+
         print('run hacking minigame if previous steps completed')
         #Last step to running hacking minigame
         if UOS.bypass is 3:
@@ -59,9 +60,15 @@ class AdminCommands(BaseCommand):
             UOS.save_settings()
 
     def command_set_default(self):
+        if not self.clearance(2):
+            return
+
         print('set default directory')
 
     def command_show_users(self):
+        if not self.clearance(2):
+            return
+
         if len(UOS.user.accounts) > 0:
             self.writer_clear()
             keys = list(UOS.user.accounts.keys())

@@ -54,6 +54,9 @@ class UOS_User:
     def has_privilege(self):
         return self.current.group in ['admin', 'maintainence']
 
+    def is_admin(self):
+        return self.current.group == 'admin'
+
     # if accounts.f exists.
     # load all user profile and store in accounts.
     # load last hex use

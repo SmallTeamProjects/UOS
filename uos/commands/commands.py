@@ -1,61 +1,55 @@
 from types import SimpleNamespace
-from .default import DefaultCommands
-from .admin import AdminCommands
-from .user import UserCommands
+from .commands_admin import AdminCommands
+from .commands_filesystem import FilesystemCommands
+from .commands_menu import MenuCommands
+from .commands_server import ServerCommands
+from .commands_systems import SystemCommands
+from .commands_terminal import TerminalCommands
+from .commands_test import TestCommands
+from .commands_user import UserCommands
+
 from ..uos import UOS
 
 class Command:
-    link = SimpleNamespace(state = None, interval = -1)
-    group_user = ['admin', 'user', 'maintainence']
-    group_admin = ['admin', 'maintainence']
-    is_init = False
+    def __init__(self):
+        self.link = SimpleNamespace(state = None, interval = -1)
 
-    @classmethod
-    def init(cls):
-        if not cls.is_init:
-            cls.is_init = True
-            cls.default = DefaultCommands(cls.link)
-            cls.admin = AdminCommands(cls.link)
-            cls.user = UserCommands(cls.link)
+        self.cmd_admin = AdminCommands(self.link)
+        self.cmd_filesystem = FilesystemCommands(self.link)
+        self.cmd_menu = MenuCommands(self.link)
+        self.cmd_server = ServerCommands(self.link)
+        self.cmd_system = SystemCommands(self.link)
+        self.cmd_terminal = TerminalCommands(self.link)
+        self.cmd_test = TestCommands(self.link)
+        self.cmd_user = UserCommands(self.link)
 
-    @classmethod
-    def cat_command(cls, text, group, cat):
-        if UOS.user.name:
-            if UOS.user.current.group in group:
-                key, command = cls.find_key(text, cat)
-                if key:
-                    cls.call_command(command, cls.call_args(key, text))
-                    return True
-        return False
+        self.command_call = {}
+        for commands in [getattr(self, cmd) for cmd in vars(self) if cmd.startswith('cmd_')]:
+            for command in [cmd for cmd in dir(commands) if cmd.startswith('command_')]:
+                # build the commands
+                c = command[8:].replace('_', ' ').upper()
+                self.command_call[c] = commands.get_command(command)
 
-    @classmethod
-    def default_command(cls, text):
-        key, command = cls.find_key(text, cls.default)
-        if key:
-            cls.call_command(command, cls.call_args(key, text))
-            return True
-        return False
+        self.command_keys = sorted(self.command_call.keys(), reverse=True)
 
-    # entry point
-    @classmethod
-    def call(cls, parent, text, single=False):
+    def __call__(self, parent, text, single=False):
         if single:
-            cls.link.action = parent.state
+            self.link.action = parent.state
         else:
-            cls.link.action = parent.parent.state
+            self.link.action = parent.parent.state
 
-        cls.link.parent = parent
-        cls.link.writer = parent.writer
-        if cls.link.state:
-            cls.call_command(cls.link.state, cls.call_args(None, text))
+        self.link.parent = parent
+        self.link.writer = parent.writer
+        if self.link.state:
+            self.call_command(self.link.state, self.call_args(None, text))
         else:
-            if not cls.cat_command(text, cls.group_admin, cls.admin):
-                if not cls.cat_command(text, cls.group_user, cls.user):
-                    if not cls.default_command(text):
-                        cls.link.writer.add('ERROR_INVALID_FUNCTION', 30)
+            key, command = self.find_key(text)
+            if key:
+                self.call_command(command, self.call_args(key, text))
+            else:
+                self.link.writer.add('ERROR INVALID FUNCTION')
 
-    @staticmethod
-    def call_args(key, text):
+    def call_args(self, key, text):
         if key:
             text = text[len(key):].strip()
 
@@ -64,27 +58,25 @@ class Command:
         elif len(text) > 0:
             return text
 
-    @classmethod
-    def call_command(cls, command, args):
+    def call_command(self, command, args):
         if args:
             if isinstance(args, (tuple, list)) and len(args) > 1:
                 try:
                     command(*args)
                 except TypeError as error:
-                    cls.error_guard(error, cls.link.writer)
+                    self.error_guard(error)
             else:
                 try:
                     command(args)
                 except TypeError as error:
-                    cls.error_guard(error, cls.link.writer)
+                    self.error_guard(error)
         else:
             try:
                 command()
             except TypeError as error:
-                cls.error_guard(error, cls.link.writer)
+                self.error_guard(error)
 
-    @staticmethod
-    def error_guard(error, writer):
+    def error_guard(self, error):
         #print(error)
         error = ''.join(error.args).split(' ')
         #print(error)
@@ -96,16 +88,15 @@ class Command:
             c = ' '.join(c.split('_'))
 
         if 'missing' in error:
-            writer.add("{0} is missing {1} arguments".format(c, error[2]), 40)
+            self.link.writer.add("{0} is missing {1} arguments".format(c, error[2]), 40)
         elif 'takes' in error:
-            writer.add("{0} takes {1} arguments".format(c, int(error[2]) - 2), 40)
+            self.link.writer.add("{0} takes {1} arguments".format(c, int(error[2]) - 2), 40)
         else:
-            writer.add("Error: " + ' '.join(error))
+            self.link.writer.add("Error: " + ' '.join(error))
 
-    @staticmethod
-    def find_key(line, commands):
+    def find_key(self, line):
         line = line.split(' ')
-        for key in commands.keys:
+        for key in self.command_keys:
             skey = key.split(' ')
             boolean = True
             for i, k in enumerate(skey):
@@ -118,6 +109,6 @@ class Command:
                     break
 
             if boolean:
-                return key, commands.command_list[key]
+                return key, self.command_call[key]
 
         return None, None
