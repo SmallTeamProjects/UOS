@@ -22,8 +22,7 @@ class UOS:
         cls.settings = SimpleNamespace(interval=30,
                                        header='Welcome to ROBCO Industries (TM) Termlink',
                                        color='green',
-                                       volume=1.0,
-                                       bypass=0)
+                                       volume=1.0)
 
         # load save settings
         if os.path.exists(cls.path.settings):
@@ -46,7 +45,6 @@ class UOS:
         cls.interval = cls.settings.interval
         cls.color.setup(cls.settings.color)
         cls.volume = cls.settings.volume
-        cls.bypass = cls.settings.bypass
         TickTimerData.setup(cls.get_interval)
         cls.data = UOS_Data()
         cls.sounds = UOS_Sounds()

@@ -52,10 +52,14 @@ class UOS_User:
         return self.current
 
     def has_privilege(self):
-        return self.current.group in ['admin', 'maintainence']
+        if self.current:
+            return self.current.group in ['admin', 'maintainence']
+        return False
 
     def is_admin(self):
-        return self.current.group == 'admin'
+        if self.current:
+            return self.current.group == 'admin'
+        return False
 
     # if accounts.f exists.
     # load all user profile and store in accounts.

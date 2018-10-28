@@ -47,23 +47,28 @@ class AdminCommands(BaseCommand):
 
         print('run diagnostic test')
 
-    def command_run_debug_accounts(self):
-        if not self.clearance(2):
-            return
-
-        print('run hacking minigame if previous steps completed')
+    def command_run_debug7accounts0f(self):
         #Last step to running hacking minigame
-        if UOS.bypass is 3:
-            self.link.action.flip('Minigame')
-            UOS.bypass = 0
-            UOS.settings.bypass = 0
-            UOS.save_settings()
+        if not self.clearance(2, 3):
+            if UOS.bypass == 4:
+                print('run hacking minigame if previous steps completed')
+                self.link.action.flip('Minigame')
+            return
 
     def command_set_default(self):
         if not self.clearance(2):
             return
 
         print('set default directory')
+
+    def command_set_halt7restart_maint(self):
+        # 3rd step to running hacking minigame
+        if not self.clearance(2, 2):
+            if UOS.bypass == 3:
+                print('step 3')
+            return
+
+        print('reset into maintainence mode')
 
     def command_show_users(self):
         if not self.clearance(2):

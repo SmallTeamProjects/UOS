@@ -12,7 +12,7 @@ class BaseCommand:
             group = None,
             filepath = None)
 
-    def clearance(self, level):
+    def clearance(self, level, bypass=None):
         if level == 1:
             boolean = UOS.user.name is not None
         elif level == 2:
@@ -21,7 +21,13 @@ class BaseCommand:
             boolean = UOS.user.is_admin()
 
         if not boolean:
-            self.writer_add("Clearance Denied")
+            if bypass == UOS.bypass:
+                UOS.bypass += 1
+            else:
+                self.writer_add("Clearance Denied")
+                UOS.bypass = 0
+        elif UOS.bypass != 0:
+            UOS.bypass = 0
 
         return boolean
 

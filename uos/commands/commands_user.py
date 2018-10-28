@@ -43,36 +43,32 @@ class UserCommands(BaseCommand):
                      "    /FILENAME",
                      "RUN ?"])
 
-    def command_set_dir_protection_owner(self):
+    def command_set_dir7protection1owner(self):
         if not self.clearance(1):
             return
 
         print('directory can only be opened by owner')
 
-    def command_set_dir_protection_password(self):
+    def command_set_dir7protection1password(self):
         if not self.clearance(1):
             return
 
         print('directory can only be opened by entering a password')
 
-    def command_set_file_protection_owner(self):
+    def command_set_file7protection1owner(self):
         if not self.clearance(1):
             return
 
         print('file can only be opened by owner')
 
-    def command_set_file_protection_owner_rwed(self):
-        if not self.clearance(1):
+    def command_set_file7protection1owner0rwed_accounts0f(self):
+        #2nd step to running hacking minigame
+        if not self.clearance(1, 1):
+            if UOS.bypass == 2:
+                print('step 2')
             return
 
-        print('step 2')
-        #2nd step to running hacking minigame
-        if UOS.bypass is 1:
-            UOS.bypass = 2
-            UOS.settings.bypass = 2
-            UOS.save_settings()
-
-    def command_set_file_protection_password(self):
+    def command_set_file7protection1password(self):
         if not self.clearance(1):
             return
 
@@ -107,17 +103,6 @@ class UserCommands(BaseCommand):
         UOS.settings.header = ' '.join(args)
         UOS.save_settings()
 
-    def command_set_inquire(self):
-        if not self.clearance(1):
-            return
-
-        self.writer_clear()
-        self.writer_add('RIT-V300')
-        UOS.bypass = 1
-        UOS.settings.bypass = 1
-        UOS.save_settings()
-        # 1st step to running hacking minigame
-
     def command_set_help(self):
         if not self.clearance(1):
             return
@@ -151,7 +136,17 @@ class UserCommands(BaseCommand):
             UOS.save_settings()
             UOS.color.change_color(color)
         else:
-            self.writer_add("Invalid color")
+            self.writer_add('Invalid color')
+
+    def command_set_terminal7inquire(self):
+        # 1st step to running hacking minigame
+        if not self.clearance(1, 0):
+            if UOS.bypass == 1:
+                print('step 1')
+            return
+
+        self.writer_clear()
+        self.writer_add('RIT-V300')
 
     def command_show_default(self):
         if not self.clearance(1):
@@ -177,7 +172,7 @@ class UserCommands(BaseCommand):
 
         print('return current running process status')
 
-    def command_show_process_all(self):
+    def command_show_process7all(self):
         if not self.clearance(1):
             return
 

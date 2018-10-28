@@ -24,11 +24,15 @@ class Command:
         self.cmd_user = UserCommands(self.link)
 
         self.command_call = {}
+        replace = [('_', ' '), ('7','/'), ('1', '-'), ('0', '.')]
         for commands in [getattr(self, cmd) for cmd in vars(self) if cmd.startswith('cmd_')]:
             for command in [cmd for cmd in dir(commands) if cmd.startswith('command_')]:
                 # build the commands
-                c = command[8:].replace('_', ' ').upper()
-                self.command_call[c] = getattr(commands, command)
+                c = command[8:]
+                for a, b in replace:
+                    c = c.replace(a, b)
+
+                self.command_call[c.upper()] = getattr(commands, command)
 
         self.command_keys = sorted(self.command_call.keys(), reverse=True)
 

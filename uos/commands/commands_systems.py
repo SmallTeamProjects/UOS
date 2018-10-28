@@ -102,14 +102,6 @@ class SystemCommands(BaseCommand):
         UOS.user.set(None)
         print('shutdown', name)
 
-    def command_set_halt_restart(self):
+    def command_set_halt7restart(self):
         UOS.user.set(None)
         self.link.action.flip('Loading')
-
-    def command_set_halt_restart_maintainence(self):
-        print('reset into maintainence mode')
-        # 3rd step to running hacking minigame
-        if UOS.bypass is 2:
-            UOS.bypass = 3
-            UOS.settings.bypass = 3
-            UOS.save_settings()
