@@ -64,10 +64,10 @@ class WriterHandler:
             position[1] += linesize
 
             if self.update:
-                if self.current.update_finish:
+                if self.current.update_after.finish:
                     self.next_line()
             elif self.current.is_finish():
-                if self.current.update_after:
+                if self.current.update_after.text:
                     self.update_after.append(self.current)
 
                 self.link.append(self.current)

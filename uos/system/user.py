@@ -78,6 +78,9 @@ class UOS_User:
             if len(self.accounts) > 0:
                 self.has_any = True
 
+        else:
+            accounts = {}
+
         # default Maintainence account
         if not accounts.get('Maintainence', False):
             self.create('Maintainence', 'minigame', 'maintainence')

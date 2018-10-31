@@ -11,6 +11,43 @@ from ..uos import UOS
 # prints everything. insert happens after line is printed. update happens
 # after the whole block is printed
 
+class TextAfter:
+    def __init__(self, after_data, zero=False):
+        self.zero = zero
+        self.pos = -1
+
+        if after_data:
+            self.interval = after_data[0]
+            self.start = after_data[1]
+            self.text = after_data[2]
+            self.finish = False
+        else:
+            self.text = None
+            self.finish = True
+
+    def callback(self, parent, timer):
+        if not self.finish:
+            if self.interval == 0:
+                parent.buffer[self.start:self.start + len(self.text)] = list(self.text)
+                self.finish = True
+            else:
+                if self.pos == -1:
+                    timer.interval = interval
+                    if self.zero:
+                        self.pos = 0
+
+                for i in range(timer.count):
+                    if self.pos < len(self.text):
+                        parent.buffer[self.start + self.pos] = text[self.pos]
+                        self.pos += 1
+                    else:
+                        self.finish = True
+                        break
+
+    def reset(self):
+        self.finish = self.text is None
+        self.pos = -1
+
 class WriterText:
     State = Enum('State', 'invisible, append', module=__name__)
 
@@ -36,12 +73,8 @@ class WriterText:
         self.interval = interval
         self.interval_pos = 0
         self.sound_keys = sound_keys
-        self.insert_after = insert_after
-        self.insert_pos = -1
-        self.insert_finish = insert_after is None
-        self.update_after = update_after
-        self.update_pos = -1
-        self.update_finish = self.update_after is None
+        self.insert_after = TextAfter(insert_after, True)
+        self.update_after = TextAfter(update_after)
 
         # Track how many spaces. Helps typewriter effect from typing
         # spaces.
@@ -52,20 +85,7 @@ class WriterText:
                 break
 
     def callback_after(self, timer):
-        interval, start, text = self.update_after
-        if interval == 0:
-            self.buffer[start:start + len(text)] = list(text)
-            self.update_finish = True
-        else:
-            if self.update_pos == -1:
-                timer.interval = interval
-                self.update_pos = 0
-
-            if self.update_pos < len(text):
-                self.buffer[start + self.update_pos] = text[self.update_pos]
-                self.update_pos += 1
-            else:
-                self.update_finish = True
+        self.update_after.callback(self, timer)
 
     def callback(self, timer):
         if not self.is_finish(True):
@@ -81,22 +101,7 @@ class WriterText:
                             if len(self.interval_change) >= self.interval_pos:
                                 timer.interval = self.interval[self.interval_pos]
         elif not self.is_finish():
-            if self.insert_after and not self.insert_finish:
-                interval, start, text = self.insert_after
-                if interval == 0:
-                    self.buffer[start:start + len(text)] = list(text)
-                    self.insert_finish = True
-                else:
-                    if self.insert_pos == -1:
-                        timer.interval = interval
-
-                    for i in range(timer.count):
-                        if self.insert_pos < len(text):
-                            self.buffer[start + self.insert_pos] = text[self.insert_pos]
-                            self.insert_pos += 1
-                        else:
-                            self.insert_finish = True
-                            break
+            self.insert_after.callback(self, timer)
 
     def extend(self, text):
         self.buffer.extend(text.buffer)
@@ -105,7 +110,7 @@ class WriterText:
     def get_rect(self):
         if self.image:
             return self.image.get_rect()
-        return pygame.Rect(0,0,0,UOS.text.get_linesize())
+        return pygame.Rect(0, 0, 0, UOS.text.get_linesize())
 
     def get_height(self):
         return UOS.text.get_linesize()
@@ -133,7 +138,7 @@ class WriterText:
     def is_finish(self, text_finish=False):
         if text_finish:
             return self.interval == 0 or self.pos > len(self.buffer)
-        return self.is_finish(True) and self.insert_finish
+        return self.is_finish(True) and self.insert_after.finish
 
     def render(self, surface, position):
         if not self.updated or self.image is None:
@@ -147,11 +152,9 @@ class WriterText:
 
     def reset(self):
         self.pos = 0
-        self.insert_pos = -1
-        self.insert_finish = self.insert_after is None
         self.interval_pos = 0
-        self.update_pos = -1
-        self.update_finish = self.update_after is None
+        self.insert_after.reset()
+        self.update_after.reset()
 
     def update_image(self):
         if self.interval == 0 or WriterText.State.append in self.state:

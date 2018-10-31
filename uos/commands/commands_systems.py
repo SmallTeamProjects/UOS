@@ -89,7 +89,6 @@ class SystemCommands(BaseCommand):
             self.writer_add('New admin {0} has been created.'.format(self.info.name))
             UOS.user.has_admin = True
             UOS.user.has_any = True
-            self.update_commands()
             self.link.state = None
             UOS.user.set(self.info.name)
             self.clear_info()

@@ -1,7 +1,7 @@
 import os
 import pygame
 from .timer import UOS_TickTimer
-from .scanline import UOS_Scanline
+from ..scanline import UOS_Scanline
 from .state import UOS_StateMethods, UOS_State
 
 class UOS_StateMachine:

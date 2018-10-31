@@ -2,7 +2,7 @@ import os
 import pygame
 from types import SimpleNamespace
 from .system import *
-from .system.timer import TickTimerData
+from .system.statemachine.timer import TickTimerData
 
 class UOS:
     State = UOS_State
