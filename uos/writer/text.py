@@ -12,8 +12,7 @@ from ..uos import UOS
 # after the whole block is printed
 
 class TextAfter:
-    def __init__(self, after_data, zero=False):
-        self.zero = zero
+    def __init__(self, after_data):
         self.pos = -1
 
         if after_data:
@@ -32,13 +31,12 @@ class TextAfter:
                 self.finish = True
             else:
                 if self.pos == -1:
-                    timer.interval = interval
-                    if self.zero:
-                        self.pos = 0
+                    timer.interval = self.interval
+                    self.pos = 0
 
                 for i in range(timer.count):
                     if self.pos < len(self.text):
-                        parent.buffer[self.start + self.pos] = text[self.pos]
+                        parent.buffer[self.start + self.pos] = self.text[self.pos]
                         self.pos += 1
                     else:
                         self.finish = True
@@ -73,7 +71,7 @@ class WriterText:
         self.interval = interval
         self.interval_pos = 0
         self.sound_keys = sound_keys
-        self.insert_after = TextAfter(insert_after, True)
+        self.insert_after = TextAfter(insert_after)
         self.update_after = TextAfter(update_after)
 
         # Track how many spaces. Helps typewriter effect from typing
