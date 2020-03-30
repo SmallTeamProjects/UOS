@@ -101,6 +101,6 @@ class SystemCommands(BaseCommand):
         UOS.user.set(None)
         print('shutdown', name)
 
-    def command_set_halt7restart(self):
+    def command_set_halt_restart(self):
         UOS.user.set(None)
         self.link.action.flip('Loading')

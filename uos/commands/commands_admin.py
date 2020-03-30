@@ -47,7 +47,7 @@ class AdminCommands(BaseCommand):
 
         print('run diagnostic test')
 
-    def command_run_debug7accounts0f(self):
+    def command_run_debug_accounts(self):
         #Last step to running hacking minigame
         if not self.clearance(2, 3):
             if UOS.bypass == 4:
@@ -61,7 +61,7 @@ class AdminCommands(BaseCommand):
 
         print('set default directory')
 
-    def command_set_halt7restart_maint(self):
+    def command_set_halt_restart_maint(self):
         # 3rd step to running hacking minigame
         if not self.clearance(2, 2):
             if UOS.bypass == 3:

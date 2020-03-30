@@ -43,32 +43,32 @@ class UserCommands(BaseCommand):
                      "    /FILENAME",
                      "RUN ?"])
 
-    def command_set_dir7protection1owner(self):
+    def command_set_dir_protection_owner(self):
         if not self.clearance(1):
             return
 
         print('directory can only be opened by owner')
 
-    def command_set_dir7protection1password(self):
+    def command_set_dir_protection_password(self):
         if not self.clearance(1):
             return
 
         print('directory can only be opened by entering a password')
 
-    def command_set_file7protection1owner(self):
+    def command_set_file_protection_owner(self):
         if not self.clearance(1):
             return
 
         print('file can only be opened by owner')
 
-    def command_set_file7protection1owner0rwed_accounts0f(self):
+    def command_set_file_protection_owner_rwed_accounts(self):
         #2nd step to running hacking minigame
         if not self.clearance(1, 1):
             if UOS.bypass == 2:
                 print('step 2')
             return
 
-    def command_set_file7protection1password(self):
+    def command_set_file_protection_password(self):
         if not self.clearance(1):
             return
 
@@ -138,7 +138,7 @@ class UserCommands(BaseCommand):
         else:
             self.writer_add('Invalid color')
 
-    def command_set_terminal7inquire(self):
+    def command_set_terminal_inquire(self):
         # 1st step to running hacking minigame
         if not self.clearance(1, 0):
             if UOS.bypass == 1:
@@ -172,7 +172,7 @@ class UserCommands(BaseCommand):
 
         print('return current running process status')
 
-    def command_show_process7all(self):
+    def command_show_process_all(self):
         if not self.clearance(1):
             return
 
