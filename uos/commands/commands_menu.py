@@ -173,8 +173,9 @@ class MenuCommands(BaseCommand):
         self.writer_clear()
         self.writer_add( ["USAGE:",
                      "MENU ADD MenuName Index",
-                     "     -t or TEXT",
-                     "     -m or SUBMENU",
+                     "     -t or TEXT DisplayText",
+                     "          , -c Command",
+                     "     -m or SUBMENU DisplayText , InternalName",
                      "     -n or NESTED",
                      "     -s or SELECTION",
                      "MENU REMOVE MenuName Index",

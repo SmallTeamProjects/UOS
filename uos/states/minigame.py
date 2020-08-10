@@ -304,9 +304,10 @@ class MinigameBase(UOS.State):
             self.writer.add(3, '> ' + word)
             self.writer.add(3, '> Entry denied.')
             self.writer.add(3, '> Likeness=' + str(likeness))
-            self.attempts -= 1
-            attempt_line = self.writer.get_line(0, 2)
-            attempt_line.set_text(attempt_line.get_text()[:-2])
+            if self.attempts > 0:
+                self.attempts -= 1
+                attempt_line = self.writer.get_line(0, 2)
+                attempt_line.set_text(attempt_line.get_text()[:-2])
             # todo if 0 attempts lock
         elif self.carrot.type is 'brackets':
             self.hack()
