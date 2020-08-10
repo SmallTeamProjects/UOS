@@ -72,8 +72,8 @@ class Command:
             "LOGOFF": self.cmd_system.command_logoff,
             "LOGOFF ?": self.cmd_system.command_logoff_help,
             "SETUP": self.cmd_system.command_setup,
-            "HALT": self.cmd_system.command_set_halt,
-            "HALT RESTART": self.cmd_system.command_set_halt_restart,
+            "SET HALT": self.cmd_system.command_set_halt,
+            "SET HALT RESTART": self.cmd_system.command_set_halt_restart,
 
             # Terminal commands
             "CLEAR": self.cmd_terminal.command_clear,
