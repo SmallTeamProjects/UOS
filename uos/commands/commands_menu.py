@@ -165,3 +165,18 @@ class MenuCommands(BaseCommand):
         UOS.user.current.menu = UOS.user.default_menu()
         self.writer_add("Menu has been reset to default")
         UOS.user.save()
+
+    def command_menu_help(self):
+        if not self.clearance(1):
+            return
+
+        self.writer_clear()
+        self.writer_add( ["USAGE:",
+                     "MENU ADD menu_name menu_index",
+                     "     -t or TEXT",
+                     "     -m or SUBMENU",
+                     "     -n or NESTED",
+                     "     -s or SELECTION",
+                     "MENU REMOVE menu_name menu_index",
+                     "MENU",
+                     "MENU ?"])

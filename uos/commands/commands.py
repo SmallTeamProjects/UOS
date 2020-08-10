@@ -59,6 +59,7 @@ class Command:
             "MENU EDIT": self.cmd_menu.command_menu_edit,
             "MENU REMOVE": self.cmd_menu.command_menu_remove,
             "MENU RESET": self.cmd_menu.command_menu_reset,
+            "MENU ?": self.cmd_menu.command_menu_help,
 
             # Server commands
             "MAIL": self.cmd_server.command_mail,

@@ -209,5 +209,6 @@ class UserCommands(BaseCommand):
                           "LOGOFF ?",
                           "MOUNT ?",
                           "MAIL ?",
+                          "MENU ?",
                           "EXIT ?",
                           "HELP or ?"])
