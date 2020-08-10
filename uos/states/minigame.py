@@ -329,6 +329,7 @@ class MinigameBase(UOS.State):
     def remove_dud(self):
         UOS.sounds.play('password', 'dud')
         self.writer.add(3, '> Dud Removed.')
+        # todo replace letters of a random word that isn't the secret word with "."
 
     def render(self, surface):
         if self.writer.is_finish() and not self.carrot.init:

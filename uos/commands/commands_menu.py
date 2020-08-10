@@ -102,7 +102,7 @@ class MenuCommands(BaseCommand):
                 UOS.user.save()
 
             else:
-                self.writer_add(menu_name + " does not exists")
+                self.writer_add(menu_name + " does not exist")
         else:
             self.writer_add(menu_name + " item can not be added")
 
@@ -124,15 +124,15 @@ class MenuCommands(BaseCommand):
                 if action in ['-t', 'TEXT']:
                     item = UOS.user.current.menu[menu_name][index][1]
                     UOS.user.current.menu[menu_name][index][1] = command
-                    self.writer_add(item + " been change to " + command)
+                    self.writer_add(item + " has been change to " + command)
                     UOS.user.save()
                 elif action in ['-s', 'SELECTION']:
                     item = UOS.user.current.menu[menu_name][index][2]
                     UOS.user.current.menu[menu_name][index][2] = command
-                    self.writer_add(item + " been change to " + command)
+                    self.writer_add(item + " has been change to " + command)
                     UOS.user.save()
             else:
-                self.writer_add(menu_name + " does not exists")
+                self.writer_add(menu_name + " does not exist")
         else:
             self.writer_add(menu_name + " item can not be altered")
 
@@ -154,7 +154,7 @@ class MenuCommands(BaseCommand):
                 self.writer_add(item[1] + " has been removed")
                 UOS.user.save()
             else:
-                self.writer_add(menu_name + " does not exists")
+                self.writer_add(menu_name + " does not exist")
         else:
             self.writer_add(menu_name + " item can not be removed")
 
@@ -172,11 +172,11 @@ class MenuCommands(BaseCommand):
 
         self.writer_clear()
         self.writer_add( ["USAGE:",
-                     "MENU ADD menu_name menu_index",
+                     "MENU ADD MenuName Index",
                      "     -t or TEXT",
                      "     -m or SUBMENU",
                      "     -n or NESTED",
                      "     -s or SELECTION",
-                     "MENU REMOVE menu_name menu_index",
+                     "MENU REMOVE MenuName Index",
                      "MENU",
                      "MENU ?"])

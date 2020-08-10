@@ -31,16 +31,10 @@ class FilesystemCommands(BaseCommand):
 
         self.writer_clear()
         self.writer_add( ["USAGE:",
-                     "CREATE FILE",
-                     "     FILENAME",
-                     "          FILETYPE",
-                     "               LOCATION",
-                     "CREATE DIR",
-                     "     NAME",
-                     "          LOCATION",
-                     "CREATE USER",
-                     "     USERNAME",
-                     "          -a",
+                     "CREATE FILE FileName FileType Location",
+                     "CREATE DIR DirectoryName Location",
+                     "CREATE USER Username",
+                     "     -a",
                "CREATE ?"])
 
     def command_change_dir(self, *dirs):
@@ -51,7 +45,7 @@ class FilesystemCommands(BaseCommand):
         if source.change_dir(*dirs):
             if source.isdir():
                 UOS.drive.path.current = source.path
-                self.writer_add('Dir has been change')
+                self.writer_add('Directory has been change')
             else:
                 self.writer_add('Is not a directory')
         else:
@@ -64,9 +58,9 @@ class FilesystemCommands(BaseCommand):
         dirpath = UOS.drive.Path(dirname, location)
         if dirpath.isdir():
             dirpath.rmdir()
-            self.writer_add('{0} directory has been delete'.format(dirname))
+            self.writer_add('{0} directory has been deleted'.format(dirname))
         else:
-            self.writer_add('{0} directory does not exists'.format(dirname))
+            self.writer_add('{0} directory does not exist'.format(dirname))
 
     def command_delete_file(self, filename, filetype, location=None):
         if not self.clearance(1):
@@ -77,7 +71,7 @@ class FilesystemCommands(BaseCommand):
             filepath.remove()
             self.writer_add('{0} has been removed'.format(filename))
         else:
-            self.writer_add("File does't exists")
+            self.writer_add("File doesn't exist")
 
     def command_delete_help(self):
         if not self.clearance(1):
@@ -85,16 +79,10 @@ class FilesystemCommands(BaseCommand):
 
         self.writer_clear()
         self.writer_add( ["USAGE:",
-                     "DELETE FILE",
-                     "     FILENAME",
-                     "          FILETYPE",
-                     "               LOCATION",
-                     "DELETE DIR",
-                     "     NAME",
-                     "          LOCATION",
-                     "               /FORCE",
-                     "DELETE USER",
-                     "     USERNAME",
+                     "DELETE FILE FileName FileType Location",
+                     "DELETE DIR DirectoryName Location",
+                     "     /FORCE",
+                     "DELETE USER Username",
                      "DELETE ?"] )
 
     def command_edit_file(self, filename, filetype, location=None):
@@ -113,10 +101,7 @@ class FilesystemCommands(BaseCommand):
 
         self.writer_clear()
         self.writer_add( ["USAGE:",
-                          "EDIT FILE",
-                          "     FILENAME",
-                          "          FILETYPE",
-                          "               LOCATION",
+                          "EDIT FILE FileName FileType Location",
                           "EDIT ?"])
 
     def command_mount(self):
@@ -177,14 +162,14 @@ class FilesystemCommands(BaseCommand):
             self.info.filepath = dirpath
             self.writer_add('Enter new directory name')
         else:
-            self.writer_add("Directory doesn't exists")
+            self.writer_add("Directory doesn't exist")
 
     def rename_dir_new(self, dirname, location=None):
         self.link.state = None
         dirpath = UOS.drive.Path(dirname, location)
         if not dirpath.exists():
             UOS.drive.rename(self.info.filepath, dirpath)
-            self.writer_add('Directory has been rename')
+            self.writer_add('Directory has been renamed')
         else:
             self.writer_add("Directory already exists")
 
@@ -196,11 +181,11 @@ class FilesystemCommands(BaseCommand):
         self.info.name = location
         filepath = UOS.drive.Path((filename, filetype), location)
         if filepath.isfile():
-            self.writer_add("Enter new filename for " + filename)
+            self.writer_add("Enter new fileName for " + filename)
             self.info.filepath = filepath
             self.link.state = self.rename_file_new
         else:
-            self.writer_add("{0} doesn't exists".format(filename))
+            self.writer_add("{0} doesn't exist".format(filename))
 
     def rename_file_new(self, filename, force=False):
         self.link.state = None
@@ -209,7 +194,7 @@ class FilesystemCommands(BaseCommand):
             self.writer_add("{0} already exists".format(filename))
         else:
             UOS.drive.rename(self.info.filepath, filepath)
-            self.writer_add('{0} has been rename to {1}'.format(self.info.name, filename))
+            self.writer_add('{0} has been renamed to {1}'.format(self.info.name, filename))
 
     def command_rename_help(self):
         if not self.clearance(1):
@@ -217,14 +202,8 @@ class FilesystemCommands(BaseCommand):
 
         self.writer_clear()
         self.writer_add( ["USAGE:",
-                     "RENAME FILE",
-                     "     FILENAME",
-                     "          FILETYPE",
-                     "               LOCATION",
-                     "RENAME DIR",
-                     "     NAME",
-                     "          LOCATION",
-                     "               /FORCE",
-                     "RENAME USER",
-                     "     USERNAME",
+                     "RENAME FILE FileName FileType Location",
+                     "RENAME DIR DirectoryName Location",
+                     "     /FORCE",
+                     "RENAME USER Username",
                      "RENAME ?"])

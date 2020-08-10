@@ -36,14 +36,14 @@ class UOS_Data:
     "RBIOS-4.02.08.00 52EE5.E7.E8",
     "COPYRIGHT 2075-2077 ROBCO INDUSTRIES",
     "Uppermem: 64 KB",
-    "Root (5AB)",
-    "Production Mode",
+    "Root (5AB)", # todo replace with the systems last selected root directory
+    "Production Mode", # todo replace this line to reflect bootmode setting
     ""
     ]),
 
     Data([["Intitializing  ", ". . . . ."]], (-1, 100), ["hard drive", "typing multiple"]),
-    Data([["[  ] Checking LOG.F  ", ". . . ."]], (-1, 100), ["hard drive", "typing multiple"],
+    Data([["[  ] Checking LOG.F  ", ". . . ."]], (-1, 100), ["hard drive", "typing multiple"], # todo check if file doesn't exist display "NO"
          insert_after=(0, 1, 'OK')),
-    Data([["[  ] Loading ACCOUNTS.F  ", ". ."]], (-1, 100), ["hard drive", "typing multiple"],
+    Data([["[  ] Loading ACCOUNTS.F  ", ". ."]], (-1, 100), ["hard drive", "typing multiple"], # todo check if file doesn't exist display "NO"
          insert_after=(0, 1, 'OK')),
     Data(["", "Done!"]))

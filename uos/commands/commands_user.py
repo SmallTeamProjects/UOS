@@ -35,12 +35,9 @@ class UserCommands(BaseCommand):
 
         self.writer_clear()
         self.writer_add( ["USAGE:",
-                     "RUN FILE",
-                     "     FILENAME",
-                     "          FILETYPE",
-                     "               LOCATION",
+                     "RUN FILE FileName FileType Location",
                      "RUN DEBUG"
-                     "    /FILENAME",
+                     "    /Filename",
                      "RUN ?"])
 
     def command_set_dir_protection_owner(self):
@@ -112,12 +109,13 @@ class UserCommands(BaseCommand):
                      "SET HALT",
                      "    /RESTART",
                      "    /RESTART MAINT",
-                     "SET HOST",
-                     "    HOSTNAME",
+                     "SET HOST Hostname",
                      "SET TERMINAL",
                      "    /INQUIRE",
                      "     HEADER",
                      "     COLOR",
+                     "     VOLUME",
+                     "     INTERVAL",
                      "SET DEFAULT",
                      "SET FILE",
                      "    /PROTECTION-OWNER",

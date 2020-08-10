@@ -37,7 +37,7 @@ class AdminCommands(BaseCommand):
             if UOS.user.remove(username):
                 self.writer_add('{0} has been removed'.format(username))
             else:
-                self.writer_add("{0} doesn't exists".format(username))
+                self.writer_add("{0} doesn't exist".format(username))
         else:
             self.writer_add('Only admin can delete users')
 
@@ -51,7 +51,6 @@ class AdminCommands(BaseCommand):
         #Last step to running hacking minigame
         if not self.clearance(2, 3):
             if UOS.bypass == 4:
-                print('run hacking minigame if previous steps completed')
                 self.link.action.flip('Minigame')
             return
 

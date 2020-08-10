@@ -34,15 +34,14 @@ class SystemCommands(BaseCommand):
             else:
                 self.writer_clear()
                 self.writer_add( ["...Checking Clearance..........",
-                             "...UNAUTHORIZED...............",
-                             "...Locking Mechanism Enable..."])
+                                  "...UNAUTHORIZED...............",
+                                  "...Locking Mechanism Enable..."])
                 self.link.state = None
 
     def command_logon_help(self):
         self.writer_clear()
         self.writer_add(["USAGE:",
-                     "LOGON",
-                     "     USERNAME",
+                     "LOGON Username",
                      "LOGON ?"])
 
     def command_logoff(self):
@@ -61,8 +60,7 @@ class SystemCommands(BaseCommand):
 
         self.writer_clear()
         self.writer_add( ["USAGE:",
-                          "LOGOFF",
-                          "     USERNAME",
+                          "LOGOFF Username",
                           "LOGOFF ?"] )
 
     def command_setup(self):
@@ -80,7 +78,7 @@ class SystemCommands(BaseCommand):
             self.writer_add('Enter {0} password.'.format(self.info.name), protect=True)
         else:
             self.writer_clear()
-            self.writer_add('Admin name needs to more the 2 characters')
+            self.writer_add('Admin name must be more than 2 characters')
             self.writer_add('Enter admin name.')
 
     def setup_password(self, password):
@@ -94,7 +92,7 @@ class SystemCommands(BaseCommand):
             self.clear_info()
         else:
             self.writer_clear()
-            self.writer_add('Password minium of 4 characters')
+            self.writer_add('Password minimum of 4 characters')
             self.writer_add('Enter {0} password.'.format(self.info.name), protect=True)
 
     def command_set_halt(self, name):
