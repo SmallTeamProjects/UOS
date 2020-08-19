@@ -30,12 +30,12 @@ class FilesystemCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                     "CREATE FILE FileName FileType Location",
-                     "CREATE DIR DirectoryName Location",
-                     "CREATE USER Username",
-                     "     -a",
-               "CREATE ?"])
+        self.writer_add(["USAGE:",
+                         "CREATE FILE FileName FileType Location",
+                         "CREATE DIR DirectoryName Location",
+                         "CREATE USER Username",
+                         "     -a",
+                         "CREATE ?"])
 
     def command_change_dir(self, *dirs):
         if not self.clearance(1):
@@ -78,12 +78,12 @@ class FilesystemCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                     "DELETE FILE FileName FileType Location",
-                     "DELETE DIR DirectoryName Location",
-                     "     /FORCE",
-                     "DELETE USER Username",
-                     "DELETE ?"] )
+        self.writer_add(["USAGE:",
+                         "DELETE FILE FileName FileType Location",
+                         "DELETE DIR DirectoryName Location",
+                         "     /FORCE",
+                         "DELETE USER Username",
+                         "DELETE ?"])
 
     def command_edit_file(self, filename, filetype, location=None):
         if not self.clearance(1):
@@ -100,15 +100,24 @@ class FilesystemCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                          "EDIT FILE FileName FileType Location",
-                          "EDIT ?"])
+        self.writer_add(["USAGE:",
+                         "EDIT FILE FileName FileType Location",
+                         "EDIT ?"])
 
     def command_mount(self):
         if not self.clearance(1):
             return
 
         print('look for external storage')
+
+    def command_mount_help(self):
+        if not self.clearance(1):
+            return
+
+        self.writer_clear()
+        self.writer_add(["USAGE:",
+                         "MOUNT",
+                         "MOUNT ?"])
 
     def command_move_dir(self, source):
         if not self.clearance(1):
@@ -201,9 +210,9 @@ class FilesystemCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                     "RENAME FILE FileName FileType Location",
-                     "RENAME DIR DirectoryName Location",
-                     "     /FORCE",
-                     "RENAME USER Username",
-                     "RENAME ?"])
+        self.writer_add(["USAGE:",
+                         "RENAME FILE FileName FileType Location",
+                         "RENAME DIR DirectoryName Location",
+                         "     /FORCE",
+                         "RENAME USER Username",
+                         "RENAME ?"])

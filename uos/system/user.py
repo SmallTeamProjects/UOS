@@ -1,6 +1,7 @@
 import os
 from types import SimpleNamespace
 
+
 class UOS_User:
     # name: current login user
     # current: current login user profile
@@ -28,7 +29,7 @@ class UOS_User:
         return {
             "MainMenu": [
                 ["SubMenu", "Documents", "Documents"],
-                ["SubMenu" ,"Settings", "Settings"],
+                ["SubMenu", "Settings", "Settings"],
                 ["Selection", "Logout", "LOGOFF"],
                 ["Selection", "Shutdown", "SET HALT"]
             ],

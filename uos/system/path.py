@@ -1,5 +1,6 @@
 import os
 
+
 class UOS_DrivePath:
     def __init__(self):
         self.drive = "UOS_DRIVE"
@@ -11,6 +12,7 @@ class UOS_DrivePath:
 
         self.current = self.drive
         self.mounted = {}
+
 
 class UOS_Path:
     @classmethod

@@ -1,6 +1,7 @@
 from .basecommand import BaseCommand
 from ..uos import UOS
 
+
 class AdminCommands(BaseCommand):
     def command_create_user(self, name, group):
         if not self.clearance(2):
@@ -48,7 +49,7 @@ class AdminCommands(BaseCommand):
         print('run diagnostic test')
 
     def command_run_debug_accounts(self):
-        #Last step to running hacking minigame
+        # Last step to running hacking minigame
         if not self.clearance(2, 3):
             if UOS.bypass == 4:
                 self.link.action.flip('Minigame')

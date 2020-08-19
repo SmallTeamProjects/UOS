@@ -2,6 +2,7 @@ import pygame
 from ..uos import UOS
 from ..writer import TextEditor
 
+
 class Editor(UOS.State):
     @staticmethod
     def setup():
@@ -28,6 +29,7 @@ class Editor(UOS.State):
     def render(self, surface):
         surface.fill((0,0,0))
         self.editor.render(surface)
+
 
 class SavingEditor(UOS.State):
     def __init__(self):

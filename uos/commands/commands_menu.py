@@ -78,15 +78,15 @@ class MenuCommands(BaseCommand):
 
         if menu_name not in default:
             if menu_name in UOS.user.current.menu.keys():
-                allowed_actions = { '-t': 'Text',
-                                  '-m': 'SubMenu',
-                                  '-n': 'Nested',
-                                  '-s': 'Selection',
-                                  'SELECTION': 'Selection',
-                                  'SUBMENU': 'SubMenu',
-                                  'NESTED': 'Nested',
-                                  'TEXT': 'Text'
-                                }
+                allowed_actions = {'-t': 'Text',
+                                   '-m': 'SubMenu',
+                                   '-n': 'Nested',
+                                   '-s': 'Selection',
+                                   'SELECTION': 'Selection',
+                                   'SUBMENU': 'SubMenu',
+                                   'NESTED': 'Nested',
+                                   'TEXT': 'Text'
+                                   }
 
                 if action in allowed_actions.keys():
                     action = allowed_actions[action]
@@ -171,13 +171,13 @@ class MenuCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                     "MENU ADD MenuName Index",
-                     "     -t or TEXT DisplayText",
-                     "          , -c Command",
-                     "     -m or SUBMENU DisplayText , InternalName",
-                     "     -n or NESTED",
-                     "     -s or SELECTION",
-                     "MENU REMOVE MenuName Index",
-                     "MENU",
-                     "MENU ?"])
+        self.writer_add(["USAGE:",
+                         "MENU ADD MenuName Index",
+                         "     -t or TEXT DisplayText",
+                         "          , -c Command",
+                         "     -m or SUBMENU DisplayText , InternalName",
+                         "     -n or NESTED",
+                         "     -s or SELECTION",
+                         "MENU REMOVE MenuName Index",
+                         "MENU",
+                         "MENU ?"])

@@ -9,6 +9,15 @@ class ServerCommands(BaseCommand):
 
         print('invoke the mail utility')
 
+    def command_mail_help(self):
+        if not self.clearance(1):
+            return
+
+        self.writer_clear()
+        self.writer_add(["USAGE:",
+                         "MAIL",
+                         "MAIL ?"])
+
     def command_set_host(self):
         if not self.clearance(1):
             return

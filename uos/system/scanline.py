@@ -1,6 +1,7 @@
 import os
 import pygame
 
+
 class UOS_Scanline:
     def __init__(self, timer, rect):
         self.rect = rect

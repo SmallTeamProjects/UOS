@@ -3,6 +3,7 @@ from .block import InputBlock, OutputBlock
 from .carrot import Carrot
 from ..uos import UOS
 
+
 class Writer:
     def __init__(self, state):
         self.state = state

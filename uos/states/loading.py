@@ -2,6 +2,7 @@ import pygame
 from ..uos import UOS
 from ..writer import Writer
 
+
 class Loading(UOS.State):
     def __init__(self):
         UOS.State.__init__(self)

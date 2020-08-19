@@ -34,11 +34,11 @@ class UserCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                     "RUN FILE FileName FileType Location",
-                     "RUN DEBUG"
-                     "    /Filename",
-                     "RUN ?"])
+        self.writer_add(["USAGE:",
+                         "RUN FILE FileName FileType Location",
+                         "RUN DEBUG"
+                         "    /Filename",
+                         "RUN ?"])
 
     def command_set_dir_protection_owner(self):
         if not self.clearance(1):
@@ -59,7 +59,7 @@ class UserCommands(BaseCommand):
         print('file can only be opened by owner')
 
     def command_set_file_protection_owner_rwed_accounts(self):
-        #2nd step to running hacking minigame
+        # 2nd step to running hacking minigame
         if not self.clearance(1, 1):
             if UOS.bypass == 2:
                 print('step 2')
@@ -75,12 +75,12 @@ class UserCommands(BaseCommand):
         if not self.clearance(1):
             return
 
-        if interval.isdigit():
+        if interval.isdigit() & interval > 0:
             UOS.interval = int(interval)
             UOS.settings.interval = int(interval)
             UOS.save_settings()
         else:
-            self.writer_add("Intervals must be a number")
+            self.writer_add("Intervals must be a number greater than 0")
 
     def command_set_volume(self, volume):
         if not self.clearance(1):
@@ -105,25 +105,25 @@ class UserCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                     "SET HALT",
-                     "    /RESTART",
-                     "    /RESTART MAINT",
-                     "SET HOST Hostname",
-                     "SET TERMINAL",
-                     "    /INQUIRE",
-                     "     HEADER",
-                     "     COLOR",
-                     "     VOLUME",
-                     "     INTERVAL",
-                     "SET DEFAULT",
-                     "SET FILE",
-                     "    /PROTECTION-OWNER",
-                     "    /PROTECTION-PASSWORD",
-                     "SET DIR",
-                     "    /PROTECTION-OWNER",
-                     "    /PROTECTION-PASSWORD",
-                     "SET ?"])
+        self.writer_add(["USAGE:",
+                         "SET HALT",
+                         "    /RESTART",
+                         "    /RESTART MAINT",
+                         "SET HOST Hostname",
+                         "SET TERMINAL",
+                         "    /INQUIRE",
+                         "     HEADER",
+                         "     COLOR",
+                         "     VOLUME",
+                         "     INTERVAL",
+                         "SET DEFAULT",
+                         "SET FILE",
+                         "    /PROTECTION-OWNER",
+                         "    /PROTECTION-PASSWORD",
+                         "SET DIR",
+                         "    /PROTECTION-OWNER",
+                         "    /PROTECTION-PASSWORD",
+                         "SET ?"])
 
     def command_set_terminal_color(self, color):
         if not self.clearance(1):
@@ -181,32 +181,32 @@ class UserCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                     "SHOW DEFAULT",
-                     "SHOW DEVICE",
-                     "    /FULL",
-                     "SHOW PROCESS",
-                     "    /ALL",
-                     "SHOW TIME",
-                     "SHOW ?"])
+        self.writer_add(["USAGE:",
+                         "SHOW DEFAULT",
+                         "SHOW DEVICE",
+                         "    /FULL",
+                         "SHOW PROCESS",
+                         "    /ALL",
+                         "SHOW TIME",
+                         "SHOW ?"])
 
     def command_help(self):
         if not self.clearance(1):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                          "SET ?",
-                          "SHOW ?",
-                          "RUN ?",
-                          "CREATE ?",
-                          "EDIT ?",
-                          "DELETE ?",
-                          "RENAME ?",
-                          "LOGON ?",
-                          "LOGOFF ?",
-                          "MOUNT ?",
-                          "MAIL ?",
-                          "MENU ?",
-                          "EXIT ?",
-                          "HELP or ?"])
+        self.writer_add(["USAGE:",
+                         "SET ?",
+                         "SHOW ?",
+                         "RUN ?",
+                         "CREATE ?",
+                         "EDIT ?",
+                         "DELETE ?",
+                         "RENAME ?",
+                         "LOGON ?",
+                         "LOGOFF ?",
+                         "MOUNT ?",
+                         "MAIL ?",
+                         "MENU ?",
+                         "EXIT ?",
+                         "HELP or ?"])

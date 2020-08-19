@@ -3,9 +3,11 @@ import pygame
 from .menu import Menu, MenuBase
 from ..uos import UOS
 
+
 class ExplorerFile(MenuBase):
     def __init__(self, parent, name):
         MenuBase.__init__(self, parent, 0, name)
+
 
 class ExplorerDir(MenuBase):
     def __init__(self, parent, name):
@@ -15,6 +17,7 @@ class ExplorerDir(MenuBase):
     def call_right(self):
         self.parent.dir_change(self.item)
 
+
 class ExplorerDirUp(MenuBase):
     def __init__(self, parent):
         MenuBase.__init__(self, parent, 0, '..')
@@ -22,12 +25,14 @@ class ExplorerDirUp(MenuBase):
     def call_right(self):
         self.parent.dir_up()
 
+
 class ExplorerBack(MenuBase):
     def __init__(self, parent):
         MenuBase.__init__(self, parent, 0, '< Back')
 
     def call_right(self):
         self.parent.state.flip_back()
+
 
 class ExplorerExit(MenuBase):
     def __init__(self, parent):

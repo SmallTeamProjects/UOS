@@ -7,6 +7,7 @@ from .minigame import Minigame
 from .idle import Idle
 from ..uos import UOS
 
+
 def setup():
     Idle()
     Terminal()

@@ -9,14 +9,16 @@ from .commands_user import UserCommands
 
 from ..uos import UOS
 
+
 class CommandLink:
     def __init__(self, state=None, interval=-1):
         self.state = state
         self.interval = interval
 
+
 class Command:
     def __init__(self):
-        self.link = CommandLink(state = None, interval = -1)
+        self.link = CommandLink(state=None, interval=-1)
 
         self.cmd_admin = AdminCommands(self.link)
         self.cmd_filesystem = FilesystemCommands(self.link)
@@ -47,6 +49,7 @@ class Command:
             "EDIT FILE": self.cmd_filesystem.command_edit_file,
             "EDIT ?": self.cmd_filesystem.command_edit_help,
             "MOUNT": self.cmd_filesystem.command_mount,
+            "MOUNT ?": self.cmd_filesystem.command_mount_help,
             "MOVE DIR": self.cmd_filesystem.command_move_dir,
             "MOVE FILE": self.cmd_filesystem.command_move_file,
             "RENAME DIR": self.cmd_filesystem.command_rename_dir,
@@ -63,6 +66,7 @@ class Command:
 
             # Server commands
             "MAIL": self.cmd_server.command_mail,
+            "MAIL ?": self.cmd_server.command_mail_help,
             "SET HOST": self.cmd_server.command_set_host,
 
             # System commands
@@ -88,12 +92,12 @@ class Command:
             "SET FILE/PROTECTION-OWNER": self.cmd_user.command_set_file_protection_owner,
             "SET FILE/PROTECTION-OWNER.RWED ACCOUNTS.F": self.cmd_user.command_set_file_protection_owner_rwed_accounts,
             "SET FILE/PROTECTION-PASSWORD": self.cmd_user.command_set_file_protection_password,
-            "SET INTERVAL":self.cmd_user.command_set_interval,
+            "SET INTERVAL": self.cmd_user.command_set_interval,
             "SET TERMINAL COLOR": self.cmd_user.command_set_terminal_color,
             "SET TERMINAL HEADER": self.cmd_user.command_set_header,
             "SET TERMINAL/INQUIRE": self.cmd_user.command_set_terminal_inquire,
-            "SET TERMINAL INTERVAL":self.cmd_user.command_set_interval,
-            "SET TERMINAL VOLUME":self.cmd_user.command_set_volume,
+            "SET TERMINAL INTERVAL": self.cmd_user.command_set_interval,
+            "SET TERMINAL VOLUME": self.cmd_user.command_set_volume,
             "SET ?": self.cmd_user.command_set_help,
             "SHOW DEFAULT": self.cmd_user.command_show_default,
             "SHOW DEVICE": self.cmd_user.command_show_device,
@@ -155,9 +159,9 @@ class Command:
                 self.error_guard(error)
 
     def error_guard(self, error):
-        #print(error)
+        # print(error)
         error = ''.join(error.args).split(' ')
-        #print(error)
+        # print(error)
         if error[0].startswith('command_'):
             error[0] = error[0][8:]
 

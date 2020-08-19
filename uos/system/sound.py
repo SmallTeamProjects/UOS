@@ -3,6 +3,8 @@ import random
 import os
 
 pygame.init()
+
+
 class UOS_Sounds:
     PATH = os.path.join('resources', 'sound')
 
@@ -15,17 +17,12 @@ class UOS_Sounds:
         self.sound_loader('typing', 5, 'UI_Hacking_CharSingle_0{0}.wav')
         self.sound_loader('hard drive', 15, 'UI_Terminal_HardDrive_A_{0:02}.wav')
         self.sound_loader('typing multiple', 4, 'UI_Hacking_CharMultiple_0{0}.wav')
-        self.sounds['scroll'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH,
-            'UI_Terminal_CharScroll_LP.wav'))
+        self.sounds['scroll'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH, 'UI_Terminal_CharScroll_LP.wav'))
         self.sounds['password'] = {}
-        self.sounds['password']['bad'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH,
-            'UI_Hacking_PassBad.wav'))
-        self.sounds['password']['good'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH,
-            'UI_Hacking_PassGood.wav'))
-        self.sounds['password']['dud'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH,
-            'UI_Hacking_PasswordHelpDud.wav'))
-        self.sounds['password']['attempt'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH,
-         'UI_Hacking_PasswordHelpAttempts.wav'))
+        self.sounds['password']['bad'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH, 'UI_Hacking_PassBad.wav'))
+        self.sounds['password']['good'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH, 'UI_Hacking_PassGood.wav'))
+        self.sounds['password']['dud'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH, 'UI_Hacking_PasswordHelpDud.wav'))
+        self.sounds['password']['attempt'] = pygame.mixer.Sound(os.path.join(UOS_Sounds.PATH, 'UI_Hacking_PasswordHelpAttempts.wav'))
 
         self.channels['enter'] = pygame.mixer.Channel(0)
         self.channels['hard drive'] = pygame.mixer.Channel(1)

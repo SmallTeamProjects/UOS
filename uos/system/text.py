@@ -1,6 +1,7 @@
 import os
 import pygame
 
+
 class UOS_Text:
     def __init__(self, color):
         self.link = color
@@ -28,7 +29,6 @@ class UOS_Text:
         #            array[y][x] = int(array[y][x] * self.alpha)
         #        except:
         #            print(array.shape, text)
-
 
         return image
 

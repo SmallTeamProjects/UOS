@@ -33,25 +33,25 @@ class SystemCommands(BaseCommand):
                 self.writer_add(["Invalid Password!", "Enter Password:"], protect=True)
             else:
                 self.writer_clear()
-                self.writer_add( ["...Checking Clearance..........",
-                                  "...UNAUTHORIZED...............",
-                                  "...Locking Mechanism Enable..."])
+                self.writer_add(["...Checking Clearance..........",
+                                 "...UNAUTHORIZED...............",
+                                 "...Locking Mechanism Enable..."])
                 self.link.state = None
 
     def command_logon_help(self):
         self.writer_clear()
         self.writer_add(["USAGE:",
-                     "LOGON Username",
-                     "LOGON ?"])
+                         "LOGON Username",
+                         "LOGON ?"])
 
     def command_logoff(self):
         if not self.clearance(1):
             return
 
         self.writer_clear()
-        self.writer_add( ["...Checking Clearance..........",
-                          "...AUTHORIZED.................",
-                          "...Locking Mechanism Enable..."] )
+        self.writer_add(["...Checking Clearance..........",
+                         "...AUTHORIZED.................",
+                         "...Locking Mechanism Enable..."])
         UOS.user.set(None)
 
     def command_logoff_help(self):
@@ -59,9 +59,9 @@ class SystemCommands(BaseCommand):
             return
 
         self.writer_clear()
-        self.writer_add( ["USAGE:",
-                          "LOGOFF Username",
-                          "LOGOFF ?"] )
+        self.writer_add(["USAGE:",
+                         "LOGOFF Username",
+                         "LOGOFF ?"])
 
     def command_setup(self):
         if not UOS.user.has_admin:

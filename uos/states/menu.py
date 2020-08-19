@@ -3,6 +3,7 @@ from types import SimpleNamespace
 from ..uos import UOS
 from ..writer import Writer
 
+
 class MenuBase:
     def __init__(self, parent, position=0, name=None):
         self.parent = parent
@@ -16,12 +17,14 @@ class MenuBase:
     def call_left(self):
         pass
 
+
 class MenuBack(MenuBase):
     def __init__(self, parent, position):
         MenuBase.__init__(self, parent, position, "Back")
 
     def call_right(self):
         self.parent.state.flip_back()
+
 
 class MenuExplorer(MenuBase):
     def __init__(self, parent, position, name, arg):
@@ -30,6 +33,7 @@ class MenuExplorer(MenuBase):
 
     def call_right(self):
         self.parent.state.flip('Explorer', self.arg)
+
 
 class MenuNested:
     def __init__(self, parent, position, name, nested_menu):
@@ -61,6 +65,7 @@ class MenuNested:
         self.parent.writer.get_line(1, self.position).set_text(self.name)
         UOS.command(self.parent, self.get_item()[2], True)
 
+
 class MenuSelection(MenuBase):
     def __init__(self, parent, position, name, command):
         MenuBase.__init__(self, parent, position, name)
@@ -69,6 +74,7 @@ class MenuSelection(MenuBase):
     def call_right(self):
         pass
         #UOS.command(self.parent, self.command, True)
+
 
 class MenuText(MenuBase):
     def __init__(self, parent, position, name, info):
@@ -98,6 +104,7 @@ class MenuText(MenuBase):
     def clear(self):
         pass
 
+
 class SubMenu(MenuBase):
     def __init__(self, parent, position, name, goto_menu):
         MenuBase.__init__(self, parent, position, name)
@@ -105,6 +112,7 @@ class SubMenu(MenuBase):
 
     def call_right(self):
         self.parent.state.flip(self.goto_menu)
+
 
 class MenuMenu(UOS.State):
     user_name = None
@@ -148,6 +156,7 @@ class MenuMenu(UOS.State):
             self.state.flip_back()
         else:
             self.state.flip('MainMenu')
+
 
 class Menu(UOS.State):
     def __init__(self, menu, menu_name, header, padding=0):

@@ -325,7 +325,6 @@ class MinigameBase(UOS.State):
         else:
             self.remove_dud()
 
-
     # removes dud
     def remove_dud(self):
         UOS.sounds.play('password', 'dud')
